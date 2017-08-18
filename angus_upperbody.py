@@ -33,7 +33,7 @@ def main(stream_index):
 
         job = service.process({"image": buff})
         res = job.result
-        pprint(res)
+        # pprint(res)
 
         for body in res['upper_bodies']:
             x, y, dx, dy = body['upper_body_roi']
@@ -52,4 +52,4 @@ if __name__ == '__main__':
     ### Web cam index might be different from 0 on your setup.
     ### To grab a given video file instead of the host computer cam, try:
     ### main("/path/to/myvideo.avi")
-    main("video/2_1.avi")
+    main("video/2cam_scene1/2017-08-07 17-54-50_0.avi")

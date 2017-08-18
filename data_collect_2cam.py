@@ -1,11 +1,13 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # coding=utf-8
+from __future__ import division  # 解决熵除法兼容问题
 import cv2
 import datetime
 import numpy as np
 import csv
 import time
-
+import angus.client
+import StringIO
 
 def entropy(band):  # 计算画面熵
     hist, _ = np.histogram(band, bins=range(0, 256))
@@ -37,7 +39,8 @@ def judge_move(cur_frame_inner, pre_frame_inner):
         img_delta = cv2.absdiff(pre_frame_inner, gray_img)
         thresh = cv2.threshold(img_delta, 25, 255, cv2.THRESH_BINARY)[1]
         thresh = cv2.dilate(thresh, None, iterations=2)
-        image, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # image, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
         for c in contours:
             if cv2.contourArea(c) < 500:  # 设置敏感度
                 continue
@@ -112,18 +115,15 @@ def cal_speed(cur_frame_inner, point_x_inner, point_y_inner, tracker_inner, cam_
 def cal_speed_upperbody(cur_frame_inner, point_x_inner, point_y_inner, cam_id_inner):
 
     gray = cv2.cvtColor(cur_frame_inner, cv2.COLOR_BGR2GRAY)
+    ret, buff = cv2.imencode(".jpg", gray, [cv2.IMWRITE_JPEG_QUALITY, 80])
 
-    bodys = bodyCascade.detectMultiScale(
-        gray,
-        scaleFactor=1.05,  # 越小越慢，越可能检测到
-        minNeighbors=2,  # 越小越慢，越可能检测到
-        minSize=(95, 80),
-        maxSize=(150, 180),
-        # minSize=(30, 30)
-        flags=cv2.CASCADE_SCALE_IMAGE
-    )
+    buff = StringIO.StringIO(np.array(buff).tostring())
 
-    if len(bodys) == 0:  # 没有人脸，速度和摄像头都为0
+    job = service.process({"image": buff})
+    res = job.result
+
+
+    if len(res['upper_bodies']) == 0:  # 没有人脸，速度和摄像头都为0
         # 一个自身判断无运动，两个速度，两个摄像头
         row.append(0)
         row.append(0)
@@ -134,9 +134,9 @@ def cal_speed_upperbody(cur_frame_inner, point_x_inner, point_y_inner, cam_id_in
     else:
 
         row.append(1)  # 自身判断有运动
-        # 只输入第一张人脸数据
-        print('Now face:', bodys)
-        x, y, w, h = bodys[0][0], bodys[0][1], bodys[0][2], bodys[0][3]
+        body = res['upper_bodies'][0]  # 只输入第一张人脸数据
+        print('Now face:', body)
+        x, y, w, h = body['upper_body_roi']
         p1 = (x, y)
         p2 = (x + w, y + h)
         cv2.rectangle(cur_frame_inner, p1, p2, (0, 255, 0), 2)
@@ -195,17 +195,19 @@ if __name__ == "__main__":
     pre_frame0, pre_frame1 = None, None  # 获取参数一：前一帧图像（灰度），判断是否有运动物体
     entropy_last0, entropy_last1 = 0, 0  # 获取参数二：前一帧抖动数值
     point_x0, point_y0, point_x1, point_y1 = 0, 0, 0, 0  # 获取参数三：初始化运动点
-    cascPath = "Webcam-Face-Detect/haarcascade_upperbody.xml"
-    bodyCascade = cv2.CascadeClassifier(cascPath)
+
+    conn = angus.client.connect()
+    service = conn.services.get_service("upper_body_detection", version=1)
+    service.enable_session()
 
     # 视频输入：文件或摄像头
-    camera0 = cv2.VideoCapture("video_overlap/2cam_scene1/2017-08-07 17-54-50_0.avi")
-    camera1 = cv2.VideoCapture("video_overlap/2cam_scene1/2017-08-07 17-54-50_1.avi")
+    camera0 = cv2.VideoCapture("video/2cam_scene1/2017-08-07 17-54-50_0.avi")
+    camera1 = cv2.VideoCapture("video/2cam_scene1/2017-08-07 17-54-50_1.avi")
 
     # 打开csv文件逐行写入
     row = []
     file_name = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
-    with open('train_2cam/data_' + file_name + '.csv', 'w', newline='') as f:  # newline不多空行
+    with open('data/data_' + file_name + '.csv', 'wb') as f:
         f_csv = csv.writer(f)
 
         # 循环获取参数
@@ -239,7 +241,6 @@ if __name__ == "__main__":
             point_x0, point_y0 = cal_speed_upperbody(cur_frame0, point_x0, point_y0, cam_id)
 
 
-
             cam_id = 1
 
             # 获取参数一：开/关
@@ -256,6 +257,7 @@ if __name__ == "__main__":
             # row = []
 
             # 写入一行
+            # print(type(row), row)
             f_csv.writerow(row)
             row = []
 
@@ -266,6 +268,7 @@ if __name__ == "__main__":
     # 计算总用时，释放内存
     global_end = time.time()
     print("global_time:", global_end - global_start)
+    service.disable_session()
     camera0.release()
     camera1.release()
     cv2.destroyAllWindows()
