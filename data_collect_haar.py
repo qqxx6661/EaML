@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
 import cv2
-import datetime
 import numpy as np
 import csv
 import time
@@ -135,7 +134,8 @@ class DataCollect(object):
         camera = cv2.VideoCapture(self.video_name)
 
         self.row = []
-        file_name = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + '_' + str(self.cam_id))
+        # file_name = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + '_' + str(self.cam_id))
+        file_name = self.video_name[-25:-4]
         with open('data/data_' + file_name + '.csv', 'w', newline='') as file:  # newline不多空行
             f = csv.writer(file)
 
@@ -185,8 +185,10 @@ def start_collect(cam_id, video_name):
 if __name__ == "__main__":
 
     global_start = time.time()
-    list_video_name = ["video/2cam_scene1/2017-08-07 17-54-50_0.avi",
-                       "video/2cam_scene1/2017-08-07 17-54-50_1.avi"]
+    list_video_name = ["video/4cam_scene1/2017-08-08 17-56-46_0.avi",
+                       "video/4cam_scene1/2017-08-08 17-56-46_1.avi",
+                       "video/4cam_scene1/2017-08-08 17-56-47_0.avi",
+                       "video/4cam_scene1/2017-08-08 17-56-47_1.avi"]
 
     for i, name in enumerate(list_video_name):
         p = Process(target=start_collect, args=(i, name))
@@ -195,3 +197,4 @@ if __name__ == "__main__":
     cv2.destroyAllWindows()
     global_end = time.time()
     print("global time:", global_end - global_start)
+
