@@ -87,8 +87,6 @@ sc = StandardScaler()
 sc.fit(X)
 X = sc.transform(X)
 
-
-
 start = time.time()
 # 训练模型，限制树的最大深度4
 logreg = linear_model.LogisticRegression(C=1e5)

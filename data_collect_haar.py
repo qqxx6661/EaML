@@ -185,10 +185,8 @@ def start_collect(cam_id, video_name):
 if __name__ == "__main__":
 
     global_start = time.time()
-    list_video_name = ["video/4cam_scene1/2017-08-08 17-56-46_0.avi",
-                       "video/4cam_scene1/2017-08-08 17-56-46_1.avi",
-                       "video/4cam_scene1/2017-08-08 17-56-47_0.avi",
-                       "video/4cam_scene1/2017-08-08 17-56-47_1.avi"]
+    list_video_name = ["video/2cam_scene1/2017-08-07 18-04-27_0.avi",
+                       "video/2cam_scene1/2017-08-07 18-04-27_1.avi"]
 
     for i, name in enumerate(list_video_name):
         p = Process(target=start_collect, args=(i, name))

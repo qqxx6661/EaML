@@ -162,10 +162,8 @@ def data_integrate(list_file):
 if __name__ == "__main__":
 
     global_start = time.time()
-    list_file_name = ["data/data_2017-08-08 17-56-46_0.csv",
-                      "data/data_2017-08-08 17-56-46_1.csv",
-                      "data/data_2017-08-08 17-56-47_0.csv",
-                      "data/data_2017-08-08 17-56-47_1.csv"]
+    list_file_name = ["data/2cam_scene1/data_2017-08-07 18-03-28_0.csv",
+                      "data/2cam_scene1/data_2017-08-07 18-03-28_1.csv"]
     data_integrate(list_file_name)
     global_end = time.time()
     print("global time:", global_end - global_start)
