@@ -42,7 +42,7 @@ def _judge_accuracy(predict_array, real_array):
             # print(predict_array[i], real_array[i])
             correct += 1
     correct_rate = correct / len(predict_array)
-    return correct_rate
+    return correct_rate * 100
 
 
 def _train_model_save(x_inner, y_inner, name):
@@ -71,7 +71,7 @@ def _train_model_save(x_inner, y_inner, name):
     print("进行决策树训练")
     start = time.time()
     clf = DecisionTreeClassifier(max_depth=5).fit(x_inner, y_inner)
-    joblib.dump(clf, "model/model_clf_" + name + ".m")
+    joblib.dump(clf, "model/model_tree_" + name + ".m")
     end = time.time()
     print("执行时间:", end - start)
 
@@ -97,14 +97,21 @@ def train_model(train_file_inner, input_frame_number_inner, input_label_delay_in
     labels_global = []
     labels_upper = []
     max_test_num = 10000
+    delay = input_label_delay_inner
     with open(train_file_inner) as file:
         for line in file:
             tokens = line.strip().split(',')
             data.append([tk for tk in tokens[2:12]])
             # print(data)
+            if delay != 0:  # 推迟label
+                delay -= 1
+                continue
             labels_global.append(tokens[0])
             labels_upper.append(tokens[1])
-    print('输入参数个数：', len(data[0]))
+    if input_label_delay_inner != 0:
+        data = data[:-input_label_delay_inner]  # 删去后面几位
+    # print('输入：', data)
+    # print('标记：', labels_global, labels_upper)
 
     if len(data) > max_test_num:  # 控制最大读取行数
         data = data[-max_test_num:]
@@ -124,18 +131,24 @@ def train_model(train_file_inner, input_frame_number_inner, input_label_delay_in
     _train_model_save(x, y_upper, 'upper')
 
 
-def test_accuracy(test_file_inner, input_frame_number, input_label_delay):
+def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_inner):
     data = []
     labels_global = []
     labels_upper = []
-
+    delay = input_label_delay_inner
     with open(test_file_inner) as file:
         for line in file:
             tokens = line.strip().split(',')
             data.append([tk for tk in tokens[2:12]])
+            if delay != 0:  # 推迟label
+                delay -= 1
+                continue
             labels_global.append(tokens[0])
             labels_upper.append(tokens[1])
-
+    if input_label_delay_inner != 0:
+        data = data[:-input_label_delay_inner]  # 删去后面几位
+    # print('输入：', data)
+    # print('标记：', labels_global, labels_upper)
     test_X = np.array(data)
     test_Y_global = np.array(labels_global)
     test_Y_upper = np.array(labels_upper)
@@ -143,23 +156,107 @@ def test_accuracy(test_file_inner, input_frame_number, input_label_delay):
     start = time.time()
     clf_linear_global = joblib.load("model/model_linear_global.m")
     test_X_result = clf_linear_global.predict(test_X)
-    print("linear全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
-    print("linear全局预测准确率2：", _judge_accuracy_ave(test_X_result, test_Y_global))
+    # print("linear全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
+    print("linear全局预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_global))
     end = time.time()
     print("执行时间:", end - start)
+    start = time.time()
+    clf_linear_upper = joblib.load("model/model_linear_upper.m")
+    test_X_result = clf_linear_upper.predict(test_X)
+    # print("linear上层预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
+    print("linear上层预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    end = time.time()
+    print("执行时间:", end - start)
+    print("-----------")
 
     start = time.time()
-    clf_linear_upper = joblib.load("model/model_linear_global.m")
-    test_X_result = clf_linear_upper.predict(test_X)
-    print("linear全局预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
-    print("linear全局预测准确率2：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    clf_rbf_global = joblib.load("model/model_rbf_global.m")
+    test_X_result = clf_rbf_global.predict(test_X)
+    # print("rbf全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
+    print("rbf全局预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_global))
     end = time.time()
     print("执行时间:", end - start)
+    start = time.time()
+    clf_rbf_upper = joblib.load("model/model_rbf_upper.m")
+    test_X_result = clf_rbf_upper.predict(test_X)
+    # print("rbf上层预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
+    print("rbf上层预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    end = time.time()
+    print("执行时间:", end - start)
+    print("-----------")
+
+    start = time.time()
+    clf_sigmoid_global = joblib.load("model/model_sigmoid_global.m")
+    test_X_result = clf_sigmoid_global.predict(test_X)
+    # print("sigmoid全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
+    print("sigmoid全局预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_global))
+    end = time.time()
+    print("执行时间:", end - start)
+    start = time.time()
+    clf_sigmoid_upper = joblib.load("model/model_sigmoid_upper.m")
+    test_X_result = clf_sigmoid_upper.predict(test_X)
+    # print("sigmoid上层预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
+    print("sigmoid上层预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    end = time.time()
+    print("执行时间:", end - start)
+    print("-----------")
+
+    start = time.time()
+    clf_tree_global = joblib.load("model/model_tree_global.m")
+    test_X_result = clf_tree_global.predict(test_X)
+    # print("tree全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
+    print("tree全局预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_global))
+    end = time.time()
+    print("执行时间:", end - start)
+    start = time.time()
+    clf_tree_upper = joblib.load("model/model_tree_upper.m")
+    test_X_result = clf_tree_upper.predict(test_X)
+    # print("tree上层预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
+    print("tree上层预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    end = time.time()
+    print("执行时间:", end - start)
+    print("-----------")
+
+    # LOC和MLP用
+    sc = StandardScaler().fit(test_X)
+    test_X = sc.transform(test_X)
+
+    start = time.time()
+    clf_logreg_global = joblib.load("model/model_logreg_global.m")
+    test_X_result = clf_logreg_global.predict(test_X)
+    # print("logreg全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
+    print("logreg全局预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_global))
+    end = time.time()
+    print("执行时间:", end - start)
+    start = time.time()
+    clf_logreg_upper = joblib.load("model/model_logreg_upper.m")
+    test_X_result = clf_logreg_upper.predict(test_X)
+    # print("logreg上层预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
+    print("logreg上层预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    end = time.time()
+    print("执行时间:", end - start)
+    print("-----------")
+
+    start = time.time()
+    clf_mlp_global = joblib.load("model/model_mlp_global.m")
+    test_X_result = clf_mlp_global.predict(test_X)
+    # print("mlp全局预测准确率：", _judge_accuracy(test_X_result, test_Y_global))
+    print("mlp全局预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_global))
+    end = time.time()
+    print("执行时间:", end - start)
+    start = time.time()
+    clf_mlp_upper = joblib.load("model/model_mlp_upper.m")
+    test_X_result = clf_mlp_upper.predict(test_X)
+    # print("mlp上层预测准确率：", _judge_accuracy(test_X_result, test_Y_upper))
+    print("mlp上层预测准确率：", _judge_accuracy_ave(test_X_result, test_Y_upper))
+    end = time.time()
+    print("执行时间:", end - start)
+    print("-----------")
 
 if __name__ == '__main__':
     test_file = "test/test_2cam_scene2(1)_901.csv"
     train_file = 'data/train_2cam_scene1_01-05.csv'
     input_frame_number = 1  # 输入维度
-    input_label_delay = 1  # 预测样本差
+    input_label_delay = 1  # 预测样本和标签差
     # train_model(train_file, input_frame_number, input_label_delay)
-    test_accuracy(train_file, input_frame_number, input_label_delay)
+    cal_accuracy(train_file, input_frame_number, input_label_delay)
