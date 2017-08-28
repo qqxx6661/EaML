@@ -186,7 +186,13 @@ if __name__ == "__main__":
 
     global_start = time.time()
     list_video_name = ["video/2cam_scene1/2017-08-07 18-04-27_0.avi",
-                       "video/2cam_scene1/2017-08-07 18-04-27_1.avi"]
+                       "video/2cam_scene1/2017-08-07 18-04-27_1.avi",
+                       "video/2cam_scene1/2017-08-07 18-00-50_0.avi",
+                       "video/2cam_scene1/2017-08-07 18-00-50_1.avi",
+                       "video/2cam_scene1/2017-08-07 18-02-11_0.avi",
+                       "video/2cam_scene1/2017-08-07 18-02-11_1.avi",
+                       "video/2cam_scene1/2017-08-07 18-03-28_0.avi",
+                       "video/2cam_scene1/2017-08-07 18-03-28_1.avi"]
 
     for i, name in enumerate(list_video_name):
         p = Process(target=start_collect, args=(i, name))
