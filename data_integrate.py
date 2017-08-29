@@ -6,7 +6,7 @@ import csv
 import time
 
 
-def output(output_list):
+def _output(output_list):
 
     if len(output_list) == 2:
         if output_list[0] == '0' and output_list[1] == '0':
@@ -38,6 +38,7 @@ def output(output_list):
         # 有特殊帧四个全开，人工识别应该去掉
         if output_list[0] == '1' and output_list[1] == '1' and output_list[2] == '1' and output_list[3] == '1':
             return '8'
+
 
 def data_integrate(list_file):
 
@@ -151,8 +152,8 @@ def data_integrate(list_file):
     with open('data/train_' + str(len(list_file)) + 'cam.csv', 'a', newline='') as f:  # newline不多空行, a是追加模式
         f_csv = csv.writer(f)
         for i in range(len(outputs)):
-            row.append(output(outputs[i]))
-            row.append(output(outputs_upper[i]))
+            row.append(_output(outputs[i]))
+            row.append(_output(outputs_upper[i]))
             for j in range(len(inputs[0])):
                 row.append(inputs[i][j])
             f_csv.writerow(row)
@@ -162,8 +163,10 @@ def data_integrate(list_file):
 if __name__ == "__main__":
 
     global_start = time.time()
-    list_file_name = ["data/2cam_scene1/data_2017-08-07 18-03-28_0.csv",
-                      "data/2cam_scene1/data_2017-08-07 18-03-28_1.csv"]
+    list_file_name = ["data/4cam_scene1/data_2017-08-08 17-59-16_0.csv",
+                      "data/4cam_scene1/data_2017-08-08 17-59-16_1.csv",
+                      "data/4cam_scene1/data_2017-08-08 17-59-17_0.csv",
+                      "data/4cam_scene1/data_2017-08-08 17-59-17_1.csv"]
     data_integrate(list_file_name)
     global_end = time.time()
     print("global time:", global_end - global_start)
