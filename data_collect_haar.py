@@ -6,6 +6,9 @@ import csv
 import time
 from multiprocessing import Process
 
+# 在中断后重新识别人脸会导致突然的速度变化，因为是和之前的有图速度进行运算
+# 两边判断现在基本不起作用
+
 
 class DataCollect(object):
     def __init__(self, cam_id, video_name):
@@ -57,13 +60,14 @@ class DataCollect(object):
         self.row.append(jitter)
         return gray_average
 
-    def _cal_speed_location(self, cur_frame_inner, point_x_inner, point_y_inner):
+    def _cal_speed_location(self, cur_frame_inner, point_x_inner, point_y_inner,
+                            smooth_times, speed_x, speed_y):
 
         # cur_frame_inner = cv2.cvtColor(cur_frame_inner, cv2.COLOR_BGR2GRAY)
         bodycascade = cv2.CascadeClassifier("haarcascade_upperbody.xml")
         bodys = bodycascade.detectMultiScale(
             cur_frame_inner,
-            scaleFactor=1.05,  # 越小越慢，越可能检测到
+            scaleFactor=1.08,  # 越小越慢，越可能检测到
             minNeighbors=2,  # 越小越慢，越可能检测到
             minSize=(95, 80),
             maxSize=(150, 180),
@@ -72,14 +76,41 @@ class DataCollect(object):
         )
 
         if len(bodys) == 0:  # 没有人脸，速度和摄像头都为0
-            self.row.append(0)  # 一个自身判断无运动
-            self.row.append(0)  # 两个速度
-            self.row.append(0)
-            self.row.append(0)  # 两个方向
-            self.row.append(0)
+
+            if point_x_inner == 0 and point_y_inner == 0:  # 未出现过
+
+                self.row.append(0)  # 一个自身判断无运动
+                self.row.append(0)  # 两个速度
+                self.row.append(0)
+                self.row.append(0)  # 左右
+                self.row.append(0)
+
+            # 加入平滑
+            else:  # 之前帧已经出现过点,进行平滑
+                if smooth_times >= 0:
+                    self.row.append(1)  # 自身判断有运动
+                    self.row.append(speed_x)
+                    self.row.append(speed_y)
+                    self.row.append(0)  # 左右
+                    self.row.append(0)
+                    smooth_times -= 1
+
+                    point_x_inner += speed_x
+                    point_y_inner += speed_y
+                    x, y, w, h = point_x_inner+speed_x, point_y_inner+speed_y, 150, 120
+                    p1 = (x, y)
+                    p2 = (x + w, y + h)
+                    cv2.rectangle(cur_frame_inner, p1, p2, (0, 255, 0), 2)
+
+                else:  # 已经平滑过5帧不再平滑
+                    self.row.append(0)  # 一个自身判断无运动
+                    self.row.append(0)  # 两个速度
+                    self.row.append(0)
+                    self.row.append(0)  # 左右
+                    self.row.append(0)
 
         else:
-
+            smooth_times = 10  # 有识别，将平滑置为5, 若置为-1，不会使用平滑
             self.row.append(1)  # 自身判断有运动
             # 只输入第一张人脸数据
             print('Now face:', bodys)
@@ -99,6 +130,8 @@ class DataCollect(object):
                 # print("纵轴速度为：", v_updown)
                 self.row.append(v_leftright)
                 self.row.append(v_updown)
+                speed_x = v_leftright
+                speed_y = v_updown
 
             point_x_inner = p1[0]
             point_y_inner = p1[1]
@@ -121,7 +154,7 @@ class DataCollect(object):
             else:
                 self.row.append(0)
 
-        return point_x_inner, point_y_inner
+        return point_x_inner, point_y_inner, smooth_times, speed_x, speed_y
 
     def data_collect(self):
         # 全局变量
@@ -130,6 +163,8 @@ class DataCollect(object):
         pre_frame = None  # 获取参数一：前一帧图像（灰度），判断是否有运动物体
         entropy_last = 0  # 获取参数二：前一帧抖动数值
         point_x, point_y = 0, 0  # 获取参数三：初始化运动点
+        smooth = 0  # 设置平滑的帧数
+        speed_x_last, speed_y_last = 0, 0  # 前一阵速度，用于平滑
 
         camera = cv2.VideoCapture(self.video_name)
 
@@ -164,10 +199,15 @@ class DataCollect(object):
                 entropy_last = self._process_rgb_delta(cur_frame, entropy_last)
 
                 # 获取参数三：速度和对应摄像头开关
-                point_x, point_y = self._cal_speed_location(cur_frame, point_x, point_y)
+                point_x, point_y, smooth, speed_x_last, speed_y_last = self._cal_speed_location(cur_frame,
+                                                                                                point_x,
+                                                                                                point_y,
+                                                                                                smooth,
+                                                                                                speed_x_last,
+                                                                                                speed_y_last)
 
                 # 写入一行
-                print(type(self.row), self.row)
+                print(self.row)
                 f.writerow(self.row)
                 self.row = []
 
@@ -185,10 +225,7 @@ def start_collect(cam_id, video_name):
 if __name__ == "__main__":
 
     global_start = time.time()
-    list_video_name = ["video/4cam_scene1/2017-08-08 17-59-16_0.avi",
-                       "video/4cam_scene1/2017-08-08 17-59-16_1.avi",
-                       "video/4cam_scene1/2017-08-08 17-59-17_0.avi",
-                       "video/4cam_scene1/2017-08-08 17-59-17_1.avi"]
+    list_video_name = ["video/2cam_scene1/2017-08-07 17-54-50_1.avi"]
 
     for i, name in enumerate(list_video_name):
         p = Process(target=start_collect, args=(i, name))

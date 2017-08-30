@@ -7,18 +7,20 @@ def log(list_name):
     for i in range(len(list_name)):
         list_name[i] = math.log10(list_name[i])
         print(list_name[i])
+    return list_name
 
 
 def ave(list_name):
     for i in range(len(list_name)):
         list_name[i] = list_name[i] / 900
         print(list_name[i])
+    return list_name
 
 size = 4
 x = np.arange(size)
 
 video_file_cloud = [56510000, 67513000, 95846000, 124214000]  # cloud处理2,4,6,8个摄像头（30s）
-ave(video_file_cloud)
+video_file_cloud = ave(video_file_cloud)
 log(video_file_cloud)
 
 # video_file_edge = [54125000, 65182000, 86251000, 101381000]  # edge各自处理1,2,3,4个摄像头（30s）
@@ -26,12 +28,12 @@ log(video_file_cloud)
 # log(video_file_edge)
 
 prediction_cloud = [56000, 108000, 175000, 257000]  # cloud预测30s视频所用时间，分析视频后预测
-ave(prediction_cloud)
-log(prediction_cloud)
+prediction_cloud = ave(prediction_cloud)
+prediction_cloud = log(prediction_cloud)
 
 prediction_EaOP = [49000, 90000, 143000, 186000]  # cloud预测30s视频所用时间，拿到数据后直接预测
-ave(prediction_EaOP)
-log(prediction_EaOP)
+prediction_EaOP = ave(prediction_EaOP)
+prediction_EaOP = log(prediction_EaOP)
 
 total_width, n = 0.8, 3
 width = total_width / n

@@ -7,15 +7,16 @@ def log(list_name):
     for i in range(len(list_name)):
         list_name[i] = math.log10(list_name[i])
         print(list_name[i])
+    return list_name
 
 size = 4
 x = np.arange(size)
 
 video_file = [11132, 21164, 34452, 45208]  # 每帧视频文件大小（byte）
-log(video_file)
+video_file = log(video_file)
 
 data_to_cloud = [127, 248, 365, 488]  # 每帧所有edge上传的文件大小（byte）（2,2,3,4个摄像头）
-log(data_to_cloud)
+data_to_cloud = log(data_to_cloud)
 
 total_width, n = 0.8, 3
 width = total_width / n

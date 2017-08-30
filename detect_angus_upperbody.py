@@ -49,7 +49,5 @@ def main(stream_index):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    ### Web cam index might be different from 0 on your setup.
-    ### To grab a given video file instead of the host computer cam, try:
-    ### main("/path/to/myvideo.avi")
-    main("video/2cam_scene1/2017-08-07 17-54-50_0.avi")
+
+    main(0)
