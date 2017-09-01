@@ -54,7 +54,7 @@ def _train_model_save(x_inner, y_inner, name):
     joblib.dump(clf_linear, "model_2cam/model_linear_" + name + ".m")
     end = time.time()
     print("执行时间:", end - start)
-
+    '''
     print("进行SVM-rbf训练")
     start = time.time()
     clf_rbf = SVC().fit(x_inner, y_inner)
@@ -68,7 +68,7 @@ def _train_model_save(x_inner, y_inner, name):
     joblib.dump(clf_sigmoid, "model_2cam/model_sigmoid_" + name + ".m")
     end = time.time()
     print("执行时间:", end - start)
-    '''
+
     print("进行决策树训练")
     start = time.time()
     clf = DecisionTreeClassifier(max_depth=5).fit(x_inner, y_inner)
@@ -220,7 +220,7 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
     end = time.time()
     print("执行时间:", end - start)
     print("-----------")
-
+    '''
     start = time.time()
     clf_rbf_global = joblib.load("model_2cam/model_rbf_global.m")
     test_X_result = clf_rbf_global.predict(test_X)
@@ -252,7 +252,7 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
     end = time.time()
     print("执行时间:", end - start)
     print("-----------")
-    '''
+
     start = time.time()
     clf_tree_global = joblib.load("model_2cam/model_tree_global.m")
     test_X_result = clf_tree_global.predict(test_X)
@@ -306,9 +306,9 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
     print("-----------")
 
 if __name__ == '__main__':
-    test_file = "test/test_2cam_scene2(1)_901.csv"
-    train_file = 'data/train_2cam_scene1_01-05.csv'
-    input_frame_number = 2  # 输入维度
-    input_label_delay = 2  # 预测样本和标签差
+    test_file = "test/2cam_test_scene1_06.csv"
+    train_file = 'data/2cam_train_scene1_01-05.csv'
+    input_frame_number = 50  # 输入维度
+    input_label_delay = 1  # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
-    # cal_accuracy(train_file, input_frame_number, input_label_delay)
+    cal_accuracy(train_file, input_frame_number, input_label_delay)
