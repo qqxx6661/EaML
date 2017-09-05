@@ -110,7 +110,7 @@ class DataCollect(object):
                     self.row.append(0)
 
         else:
-            smooth_times = 10  # 有识别，将平滑置为5, 若置为-1，不会使用平滑
+            smooth_times = -1  # 有识别，将平滑置为5, 若置为-1，不会使用平滑
             self.row.append(1)  # 自身判断有运动
             # 只输入第一张人脸数据
             print('Now face:', bodys)
