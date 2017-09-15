@@ -4,7 +4,7 @@
 import numpy as np
 import cv2
 
-cap0 = cv2.VideoCapture(2)
+cap0 = cv2.VideoCapture(0)
 # 定义解码器并创建VideoWrite对象
 # linux: XVID、X264; windows:DIVX
 # 20.0指定一分钟的帧数

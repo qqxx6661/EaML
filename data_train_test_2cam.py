@@ -305,6 +305,7 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
     print("执行时间:", end - start)
     print("-----------")
 
+
 if __name__ == '__main__':
     test_file = "test/2cam_test_scene1_06.csv"
     train_file = 'data/2cam_train_scene1_01-05.csv'
