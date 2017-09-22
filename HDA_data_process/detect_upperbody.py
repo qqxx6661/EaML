@@ -9,7 +9,6 @@ for i in range(2000):
     frame = cv2.imread(img_root+str(i+1)+'.jpg')
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-q
     body = bodyCascade.detectMultiScale(
         gray,
         scaleFactor=1.08,

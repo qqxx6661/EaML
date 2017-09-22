@@ -166,7 +166,7 @@ class DataCollect(object):
         smooth = 0  # 设置平滑的帧数
         speed_x_last, speed_y_last = 0, 0  # 前一阵速度，用于平滑
 
-        camera = cv2.VideoCapture(self.video_name)
+        camera = cv2.VideoCapture(self.video_name)  # self.video_name
 
         self.row = []
         # file_name = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S") + '_' + str(self.cam_id))
@@ -225,7 +225,7 @@ def start_collect(cam_id, video_name):
 if __name__ == "__main__":
 
     global_start = time.time()
-    list_video_name = ["video/2cam_scene1/2017-08-07 17-54-50_1.avi"]
+    list_video_name = ["video/2cam_scene1/2017-08-07 18-00-50_0.avi"]
 
     for i, name in enumerate(list_video_name):
         p = Process(target=start_collect, args=(i, name))

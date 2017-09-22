@@ -10,8 +10,8 @@ cap0 = cv2.VideoCapture(0)
 # 20.0指定一分钟的帧数
 fourcc = cv2.VideoWriter_fourcc(*'DIVX')
 out0 = cv2.VideoWriter('video/output0.avi', fourcc, 20.0, (640, 480))
-
-record_status = 0
+record_total = 930
+record_status = 1
 while True:
     # 读取一帧
     status0, frame0 = cap0.read()
@@ -26,7 +26,10 @@ while True:
         # frame0 = cv2.flip(frame0, 0)
         # frame1 = cv2.flip(frame1, 0) # 翻转图像
         out0.write(frame0)
-
+        print(record_total)
+        if record_total == 0:
+            break
+        record_total -= 1
 
     # 显示帧
     cv2.imshow('frame0', frame0)
