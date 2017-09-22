@@ -8,10 +8,10 @@ cap1 = cv2.VideoCapture(1)
 # 定义解码器并创建VideoWrite对象
 # linux: XVID、X264; windows:DIVX
 # 20.0指定一秒钟的帧数
-fourcc = cv2.VideoWriter_fourcc(*'DIVX')
+fourcc = cv2.VideoWriter_fourcc(*'X264')
 file_name = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
-out0 = cv2.VideoWriter('video_overlap/' + file_name + '_0.avi', fourcc, 30.0, (640, 480))
-out1 = cv2.VideoWriter('video_overlap/' + file_name + '_1.avi', fourcc, 30.0, (640, 480))
+out0 = cv2.VideoWriter('video/' + file_name + '_0.avi', fourcc, 30.0, (640, 480))
+out1 = cv2.VideoWriter('video/' + file_name + '_1.avi', fourcc, 30.0, (640, 480))
 record_status = 0
 record_total = 930
 time.sleep(13)
