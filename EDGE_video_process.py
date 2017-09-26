@@ -78,11 +78,14 @@ with open('BSU_data/' + cam_id + '.csv', 'w', newline='') as file:  # newline不
                 if CLASSES[idx] == 'person':
 
                     # # cut the ROI image
-                    # person_image = frame[startY:endY, startX:endX]
-                    # # cv2.imshow('image', person_image)
-                    # # cv2.waitKey(0)
-                    # cv2.imwrite('image' + str(save_image_count) + '.jpg', person_image)
-                    # save_image_count += 1
+                    person_image = frame[startY:endY, startX:endX]
+                    # try:
+                    #     cv2.imshow('image', person_image)
+                    #     # cv2.waitKey(0)
+                    # except:
+                    #     continue
+                    cv2.imwrite('image' + str(save_image_count) + '.jpg', person_image)
+                    save_image_count += 1
 
                     row.append([startX, startY, endX, endY])
 
