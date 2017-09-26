@@ -13,7 +13,7 @@ index = {}
 images = {}
 
 # loop over the image paths
-for imagePath in glob.glob("images" + "/*.png"):
+for imagePath in glob.glob("images" + "/*.jpg"):
     # extract the image filename (assumed to be unique) and
     # load the image, updating the images dictionary
     filename = imagePath[imagePath.rfind("/") + 1:]
@@ -28,8 +28,7 @@ for imagePath in glob.glob("images" + "/*.png"):
     hist = cv2.normalize(hist, hist).flatten()
 
     index[filename] = hist
-
-print(index)
+    print(type(hist))
 # # METHOD #1: UTILIZING OPENCV
 # # initialize OpenCV methods for histogram comparison
 # OPENCV_METHODS = (
@@ -98,7 +97,7 @@ for (methodName, method) in SCIPY_METHODS:
     for (k, hist) in index.items():
         # compute the distance between the two histograms
         # using the method and update the results dictionary
-        d = method(index["doge.png"], hist)
+        d = method(index["image5.jpg"], hist)
         results[k] = d
 
     print(results)
@@ -108,7 +107,7 @@ for (methodName, method) in SCIPY_METHODS:
     # show the query image
     fig = plt.figure("Query")
     ax = fig.add_subplot(1, 1, 1)
-    ax.imshow(images["doge.png"])
+    ax.imshow(images["image5.jpg"])
     plt.axis("off")
 
     # initialize the results figure
