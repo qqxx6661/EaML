@@ -15,6 +15,7 @@ def reID_extractor(image):
     hist = cv2.calcHist([image], [0, 1, 2], None, [8, 8, 8],
                         [0, 256, 0, 256, 0, 256])
     hist = cv2.normalize(hist, hist).flatten()
+    print(type(hist))
     return hist
 
 
@@ -35,13 +36,11 @@ if __name__ == '__main__':
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     print("[INFO] starting video stream...")
-    filename = 'video_BSU/2017-09-23 15-47-21_3.avi'
+    filename = 'video_BSU/2017-09-23 15-47-21_0.avi'
     vs = FileVideoStream(filename).start()
     time.sleep(2.0)
     fps = FPS().start()
 
-    # save image
-    save_image_count = 0
     # create CSV
     row = []
     timestamp = 0
@@ -50,9 +49,9 @@ if __name__ == '__main__':
         f = csv.writer(file)
 
         # loop over the frames from the video stream
-        # while 会卡住
-        for i in range(1800):
+        for i in range(1800):  # while 会卡住
 
+            person_count = 0
             # grab the frame from the threaded video stream and resize it
             # to have a maximum width of 400 pixels
             frame = vs.read()
@@ -70,7 +69,7 @@ if __name__ == '__main__':
 
             row.append(int(cam_id))
             row.append(timestamp)
-            timestamp += 1
+
 
             # loop over the detections
             for i in np.arange(0, detections.shape[2]):
@@ -93,20 +92,37 @@ if __name__ == '__main__':
 
                         # # cut the ROI image
                         person_image = frame[startY:endY, startX:endX]
-                        reID_feature = reID_extractor(person_image)
+
+                        # 剪切图片保存（尝试）
+                        startX_new = int(startX + 0.25 * (endX - startX))
+                        endX_new = int(endX - 0.25 * (endX - startX))
+                        person_image = person_image[startY:endY, startX_new:endX_new]
+                        print(startX, startY, endX, endY)
+                        print(startX_new, startY, endX_new, endY)
+
+                        # 保存为nparray
+                        reID_feature = reID_extractor(person_image)  # class 'numpy.ndarray'
+                        reID_filename = 'BSU_data/' + cam_id + '/' + str(timestamp) + '_' + str(person_count) + '.npy'
+                        np.save(reID_filename, reID_feature)
+
+                        # 显示
                         # try:
                         #     cv2.imshow('image', person_image)
                         #     # cv2.waitKey(0)
                         # except:
                         #     continue
-                        # cv2.imwrite('image' + str(save_image_count) + '.jpg', person_image)
-                        # save_image_count += 1
 
-                        row.append([[startX, startY, endX, endY], reID_feature])
+                        # 保存为图片
+                        cv2.imwrite('reID_image_test/' + cam_id + '_image' + str(timestamp) + '.jpg',
+                                    person_image)
+                        # time.sleep(2)
 
-                        label = "{}: {:.2f}%".format(CLASSES[idx],
+                        row.append([[startX, startY, endX, endY], reID_filename])
+
+                        label = str(timestamp) + "{}: {:.2f}%".format(CLASSES[idx],
                             confidence * 100)
-                        cv2.rectangle(frame, (startX, startY), (endX, endY),
+                        # 改为显示裁剪后box
+                        cv2.rectangle(frame, (startX_new, startY), (endX_new, endY),
                             COLORS[idx], 2)
                         y = startY - 15 if startY - 15 > 15 else startY + 15
                         cv2.putText(frame, label, (startX, y),
@@ -126,6 +142,7 @@ if __name__ == '__main__':
             print(row)
             f.writerow(row)
             row = []
+            timestamp += 1
 
     # stop the timer and display FPS information
     fps.stop()

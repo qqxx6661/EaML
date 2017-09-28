@@ -1,30 +1,26 @@
 #!/usr/bin/env python3
 # coding=utf-8
 from scipy.spatial import distance as dist
-import matplotlib.pyplot as plt
 import numpy as np
-import glob
 import cv2
 
-def reID_result(image_HSV):
+def reID(filename, gallery_person_list):
+
+    max_similiar = 0
+    person = 0
+    target_hist = np.load(filename)
+    for i in range(len(gallery_person_list)):
+        gallery_hist = np.load(gallery_person_list[i])
+        # print(target_hist)
+        similiar = cv2.compareHist(target_hist, gallery_hist, cv2.HISTCMP_INTERSECT)
+        print(i, similiar)
+        if max_similiar < similiar:
+            max_similiar = similiar
+            person = i
+    # print(person)
+    return person
 
 
-    return person_ID
+reID('BSU_data/0/61_0.npy', ['gallery/133_0.npy', 'gallery/60_0.npy'])
 
-results = {}
-# target
-target_image_path = '/reID_image_test/image5.jpg'
-target_image = cv2.imread(target_image_path)
-target_image_hist = cv2.calcHist([target_image], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
-target_image_hist = cv2.normalize(target_image_hist, target_image_hist).flatten()
-
-# gallery
-for i in range(1, 161):
-    gallery_image_path = '/reID_image_test/image' + str(i) + '.jpg'
-    gallery_image = cv2.imread(gallery_image_path)
-    gallery_image_hist = cv2.calcHist([gallery_image], [0, 1, 2], None, [8, 8, 8], [0, 256, 0, 256, 0, 256])
-    gallery_image_hist = cv2.normalize(gallery_image_hist, gallery_image_hist).flatten()
-    d = dist.euclidean(target_image_hist, gallery_image_hist)
-    results[i] = d
-
-print(results)
+print(np.load('BSU_data/0/95_0.npy'))
