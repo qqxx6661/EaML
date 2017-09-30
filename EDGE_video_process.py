@@ -114,8 +114,8 @@ if __name__ == '__main__':
                         #     continue
 
                         # 保存为图片
-                        cv2.imwrite('reID_image_test/' + cam_id + '_image' + str(timestamp) + '.jpg',
-                                    person_image)
+                        # cv2.imwrite('reID_image_test/' + cam_id + '_image' + str(timestamp) + '.jpg',
+                        #             person_image)
 
                         row.append([[startX, startY, endX, endY], reID_filename])
 

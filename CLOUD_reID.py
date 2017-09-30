@@ -13,7 +13,10 @@ def reID(filename, gallery_person_list):
         gallery_hist = np.load(gallery_person_list[i])
         # print(target_hist)
         similiar = cv2.compareHist(target_hist, gallery_hist, cv2.HISTCMP_INTERSECT)
-        print(i, similiar)
+        print(filename, gallery_person_list[i], similiar)
+        if similiar == 0.0:  # 写入失败文件忽略
+            print('图像数据损坏，不予处理')
+            return -1
         if max_similiar < similiar:
             max_similiar = similiar
             person = i

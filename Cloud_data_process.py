@@ -22,7 +22,7 @@ for filename in range(6):
 # for nei in all_data:
 #     print(nei)
 
-gallery_person_list = ['gallery/58_0.npy', 'gallery/164_0.npy']  # 画廊人员信息
+gallery_person_list = ['gallery/57_0.npy', 'gallery/156_0.npy']  # 画廊人员信息
 person_track_list = [[], []]
 new_person_count = 5  # 5次连续出现
 # 在每一帧的循环中，将该帧出现的人与画廊进行匹配，若与某人相似度大于某值，则认为是那个人
@@ -30,7 +30,9 @@ for frame in range(len(all_data)):
     if len(all_data[frame]) > 1:
         for person in range(len(all_data[frame])-1):
             reID_result = CLOUD_reID.reID(all_data[frame][person+1][2], gallery_person_list)
-            print(frame, all_data[frame][person+1][0], reID_result)
+            if reID_result == -1:  # 写入失败文件忽略
+                continue
+            print(frame, 'cam_id:', all_data[frame][person+1][0], 'result:', reID_result)
             person_track_list[reID_result].append([frame, all_data[frame][person+1][0],
                                                    all_data[frame][person+1][1]])
 
