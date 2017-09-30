@@ -22,7 +22,7 @@ for filename in range(6):
 # for nei in all_data:
 #     print(nei)
 
-gallery_person_list = ['gallery/60_0.npy', 'gallery/133_0.npy']  # 画廊人员信息
+gallery_person_list = ['gallery/58_0.npy', 'gallery/164_0.npy']  # 画廊人员信息
 person_track_list = [[], []]
 new_person_count = 5  # 5次连续出现
 # 在每一帧的循环中，将该帧出现的人与画廊进行匹配，若与某人相似度大于某值，则认为是那个人

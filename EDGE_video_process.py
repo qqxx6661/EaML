@@ -36,7 +36,7 @@ if __name__ == '__main__':
     # initialize the video stream, allow the cammera sensor to warmup,
     # and initialize the FPS counter
     print("[INFO] starting video stream...")
-    filename = 'video_BSU/2017-09-23 15-47-21_0.avi'
+    filename = 'video_BSU/2017-09-23 15-47-32_5.avi'
     vs = FileVideoStream(filename).start()
     time.sleep(2.0)
     fps = FPS().start()
@@ -96,9 +96,10 @@ if __name__ == '__main__':
                         # 剪切图片保存（尝试）
                         startX_new = int(startX + 0.25 * (endX - startX))
                         endX_new = int(endX - 0.25 * (endX - startX))
-                        person_image = person_image[startY:endY, startX_new:endX_new]
                         print(startX, startY, endX, endY)
                         print(startX_new, startY, endX_new, endY)
+                        person_image = frame[startY:endY, startX_new:endX_new]
+
 
                         # 保存为nparray
                         reID_feature = reID_extractor(person_image)  # class 'numpy.ndarray'
@@ -108,14 +109,13 @@ if __name__ == '__main__':
                         # 显示
                         # try:
                         #     cv2.imshow('image', person_image)
-                        #     # cv2.waitKey(0)
+                        #     cv2.waitKey(0)
                         # except:
                         #     continue
 
                         # 保存为图片
                         cv2.imwrite('reID_image_test/' + cam_id + '_image' + str(timestamp) + '.jpg',
                                     person_image)
-                        # time.sleep(2)
 
                         row.append([[startX, startY, endX, endY], reID_filename])
 
