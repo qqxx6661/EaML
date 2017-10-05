@@ -6,7 +6,7 @@ import csv
 import time
 
 
-def _output(output_list):
+def (output_list):
 
     if len(output_list) == 2:
         if output_list[0] == '0' and output_list[1] == '0':

@@ -5,22 +5,48 @@ import numpy as np
 import cv2
 
 def reID(filename, gallery_person_list):
-
-    max_similiar = 0
     person = 0
     target_hist = np.load(filename)
+
+    # max_similiar = 0
+    # for i in range(len(gallery_person_list)):
+    #     gallery_hist = np.load(gallery_person_list[i])
+    #     # print(target_hist)
+    #     similiar = cv2.compareHist(target_hist, gallery_hist, cv2.HISTCMP_CORREL)
+    #     print(filename, gallery_person_list[i], similiar)
+    #     if similiar == 0.0:  # 写入失败文件忽略
+    #         print('图像数据损坏，不予处理')
+    #         return -1
+    #     if max_similiar < similiar:
+    #         max_similiar = similiar
+    #         person = i
+
+    # min_similiar = 99999
+    # for i in range(len(gallery_person_list)):
+    #     gallery_hist = np.load(gallery_person_list[i])
+    #     # print(target_hist)
+    #     similiar = cv2.compareHist(target_hist, gallery_hist, cv2.HISTCMP_CHISQR)
+    #     print(filename, gallery_person_list[i], similiar)
+    #     if similiar == 0.0:  # 写入失败文件忽略
+    #         print('图像数据损坏，不予处理')
+    #         return -1
+    #     if min_similiar > similiar:
+    #         min_similiar = similiar
+    #         person = i
+
+    min_similiar = 99999
     for i in range(len(gallery_person_list)):
         gallery_hist = np.load(gallery_person_list[i])
         # print(target_hist)
-        similiar = cv2.compareHist(target_hist, gallery_hist, cv2.HISTCMP_INTERSECT)
+        similiar = dist.cityblock(gallery_hist, target_hist)
         print(filename, gallery_person_list[i], similiar)
         if similiar == 0.0:  # 写入失败文件忽略
             print('图像数据损坏，不予处理')
             return -1
-        if max_similiar < similiar:
-            max_similiar = similiar
+        if min_similiar > similiar:
+            min_similiar = similiar
             person = i
-    # print(person)
+
     return person
 
 

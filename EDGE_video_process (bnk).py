@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # coding=utf-8
 # import the necessary packages
 from imutils.video import FileVideoStream
@@ -118,7 +117,7 @@ if __name__ == '__main__':
                         #             person_image)
 
                         row.append([[startX, startY, endX, endY], reID_filename])
-
+                        person_count += 1
                         label = str(timestamp) + "{}: {:.2f}%".format(CLASSES[idx],
                             confidence * 100)
                         # 改为显示裁剪后box
