@@ -11,13 +11,35 @@ def relative_position(cood):
     return value
 
 
-person = 'person_1'  # 文件名
+def cam_predict(cam_id, position):  # 由于场景是预先设计好的，所以这里需要手动设置
+    cam = [0, 0, 0, 0, 0, 0]
+    cam[cam_id] = 100
+    if cam_id == 0:
+        if position > 0: cam[1] = position
+    elif cam_id == 1:
+        if position > 0: cam[2] = position
+        else: cam[0] = abs(position)
+    elif cam_id == 2:
+        if position > 0: cam[3] = position
+        else: cam[1] = cam[5] = abs(position)
+    elif cam_id == 3:
+        if position < 0: cam[2] = abs(position)
+    elif cam_id == 4:
+        if position < 0: cam[5] = abs(position)
+    else:
+        if position > 0: cam[4] = position
+        else: cam[2] = abs(position)
+    return cam
+
+
+person = 'person_0'  # 文件名
 cal_speed_delay = 6  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 # 创建所有帧数组
 all_data = []
 for frame in range(1800):
     all_data.append([frame, ])
+all_data_ML = []
 
 # 读取
 with open('gallery/' + person +'.csv') as csvFile:
@@ -61,6 +83,23 @@ with open('gallery/' + person +'.csv') as csvFile:
 for line in all_data:
     print(line)
 
+# 写入person_x_predict
 with open('gallery/' + person + '_predict.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
+
+# 写入person_x_ML
+for line in all_data:
+    if len(line) == 5:  # 有速度的才处理
+        ML_temp = []
+        ML_temp.append(line[1])
+        ML_temp.append(line[4][0])
+        ML_temp.append(line[4][1])
+        cam_list = cam_predict(int(line[1]), line[3])
+        for cam_value in cam_list:
+            ML_temp.append(cam_value)
+        all_data_ML.append(ML_temp)
+
+with open('gallery/' + person + '_ML.csv', 'w') as f:
+    f_csv = csv.writer(f)
+    f_csv.writerows(all_data_ML)
