@@ -11,8 +11,8 @@ def relative_position(cood):
     return value
 
 
-person = 'person_0'  # 文件名
-cal_speed_delay = 5  # 连续在同一摄像头n帧后再计算速度
+person = 'person_1'  # 文件名
+cal_speed_delay = 6  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 # 创建所有帧数组
 all_data = []
@@ -28,31 +28,34 @@ with open('gallery/' + person +'.csv') as csvFile:
         # 长度大于1说明这帧之前有了，异常.由于暂时一共就两个人，所以只比较两个值
         if len(all_data[frame_now]) > 1:
             # 这里若报错，说明前面一帧也没有信息，假设没有出现这种情况
-            last_position = int(all_data[frame_now - 1][2])
-            if abs(all_data[frame_now][2] - last_position) > abs(relative_position(eval(item[2])) - last_position):
-                # 删除，未完成
-                all_data[frame_now].pop(1)
-                all_data[frame_now].pop(2)
-                all_data[frame_now].pop(3)
+            last_position = int(all_data[frame_now-1][3])
+            if abs(all_data[frame_now][3] - last_position) > abs(relative_position(eval(item[2])) - last_position):
+                while len(all_data[frame_now]) > 1:
+                    all_data[frame_now].pop()
             else:
                 # 不需要存储了，使用上次数据
                 continue
 
         all_data[frame_now].append(item[1])  # 加入camid
+        all_data[frame_now].append(eval(item[2]))  # 加入位置，主要用于速度计算
         all_data[frame_now].append(relative_position(eval(item[2])))  # 加入相对位置
-        # 加入速度：连续N帧有，才加入速度
+        # 加入速度
         for i in range(cal_speed_delay):
-            # print(len(all_data[frame_now - (i+1)]))
+            # 连续N帧有
             if len(all_data[frame_now - (i+1)]) == 1:
+                cal_speed_delay_flag = 0
+                break
+            # 连续N帧在同一个摄像头内
+            if all_data[frame_now - (i+1)][1] != item[1]:
                 cal_speed_delay_flag = 0
                 break
         if cal_speed_delay_flag == 0:
             cal_speed_delay_flag = 1
             # print('jump')
             continue
-        all_data[frame_now].append('speed')
-
-
+        speed_x = int(eval(item[2])[0]) - int(all_data[frame_now-1][2][0])
+        speed_y = int(eval(item[2])[1]) - int(all_data[frame_now-1][2][1])
+        all_data[frame_now].append([speed_x, speed_y])  # x,y轴速度
 
 # 遍历all_data
 for line in all_data:
