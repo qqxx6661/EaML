@@ -31,8 +31,8 @@ def cam_predict(cam_id, position):  # 由于场景是预先设计好的，所以
         else: cam[2] = abs(position)
     return cam
 
-
-person = 'person_0'  # 文件名
+exp_info = 'yolo_1607'
+person = 'person_1'  # 文件名
 cal_speed_delay = 6  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 # 创建所有帧数组
@@ -84,7 +84,7 @@ for line in all_data:
     print(line)
 
 # 写入person_x_predict
-with open('gallery/' + person + '_predict.csv', 'w') as f:
+with open('gallery/' + exp_info + person + '_predict.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
@@ -100,6 +100,6 @@ for line in all_data:
             ML_temp.append(cam_value)
         all_data_ML.append(ML_temp)
 
-with open('gallery/' + person + '_ML.csv', 'w') as f:
+with open('gallery/' + exp_info + person + '_ML.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data_ML)

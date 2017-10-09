@@ -11,10 +11,11 @@ cap1 = cv2.VideoCapture(1)
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 file_name = str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S"))
 out0 = cv2.VideoWriter('video/' + file_name + '_0.avi', fourcc, 30.0, (640, 480))
-out1 = cv2.VideoWriter('video/' + file_name + '_4.avi', fourcc, 30.0, (640, 480))
+out1 = cv2.VideoWriter('video/' + file_name + '_3.avi', fourcc, 30.0, (640, 480))
 record_status = 1
 record_total = 1800
-time.sleep(30)
+time.sleep(33)
+# time.sleep(0)
 while True:
     # 读取一帧
     status0, frame0 = cap0.read()

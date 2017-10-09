@@ -53,7 +53,7 @@ for (methodName, method) in OPENCV_METHODS:
     for (k, hist) in index.items():
         # compute the distance between the two histograms
         # using the method and update the results dictionary
-        d = cv2.compareHist(index["5_image1637.jpg"], hist, method)
+        d = cv2.compareHist(index["3_image1168.jpg"], hist, method)
         results[k] = d
 
     print(results)
@@ -63,7 +63,7 @@ for (methodName, method) in OPENCV_METHODS:
     # show the query image
     fig = plt.figure("Query")
     ax = fig.add_subplot(1, 1, 1)
-    ax.imshow(images["5_image1637.jpg"])
+    ax.imshow(images["3_image1168.jpg"])
     plt.axis("off")
 
     # initialize the results figure
@@ -98,7 +98,7 @@ for (methodName, method) in SCIPY_METHODS:
     for (k, hist) in index.items():
         # compute the distance between the two histograms
         # using the method and update the results dictionary
-        d = method(index["5_image1637.jpg"], hist)
+        d = method(index["3_image1168.jpg"], hist)
         results[k] = d
 
     print(results)
@@ -108,7 +108,7 @@ for (methodName, method) in SCIPY_METHODS:
     # show the query image
     fig = plt.figure("Query")
     ax = fig.add_subplot(1, 1, 1)
-    ax.imshow(images["5_image1637.jpg"])
+    ax.imshow(images["3_image1168.jpg"])
     plt.axis("off")
 
     # initialize the results figure
@@ -145,7 +145,7 @@ for (k, hist) in index.items():
     # compute the distance between the two histograms
     # using the custom chi-squared method, then update
     # the results dictionary
-    d = chi2_distance(index["5_image1637.jpg"], hist)
+    d = chi2_distance(index["3_image1168.jpg"], hist)
     results[k] = d
 
 # sort the results
@@ -154,7 +154,7 @@ results = sorted([(v, k) for (k, v) in results.items()])
 # show the query image
 fig = plt.figure("Query")
 ax = fig.add_subplot(1, 1, 1)
-ax.imshow(images["5_image1637.jpg"])
+ax.imshow(images["3_image1168.jpg"])
 plt.axis("off")
 
 # initialize the results figure

@@ -3,7 +3,8 @@
 import CLOUD_reID
 import csv
 
-gallery_person_list = ['gallery/61_0.npy', 'gallery/143_0.npy']  # 画廊人员信息
+exp_info = 'yolo_1607'
+gallery_person_list = ['gallery/yolo_1607_71_0.npy', 'gallery/yolo_1607_163_0.npy']  # 画廊人员信息
 person_track_list = [[], []]
 new_person_count = 5  # 5次连续出现，还没使用
 # 创建所有帧数组
@@ -41,7 +42,7 @@ for frame in range(len(all_data)):
 
 # 写入那个人的person_id.csv,[#frame, #camid, #[xywh]]
 for gallery_person in range(len(person_track_list)):
-    with open('gallery/person_' + str(gallery_person) + '.csv', 'w') as f:
+    with open('gallery/' + exp_info + '_person_' + str(gallery_person) + '.csv', 'w') as f:
         f_csv = csv.writer(f)
         f_csv.writerows(person_track_list[gallery_person])
 

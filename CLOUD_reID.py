@@ -8,6 +8,7 @@ def reID(filename, gallery_person_list):
     person = 0
     target_hist = np.load(filename)
 
+    # 越大越好cv
     # max_similiar = 0
     # for i in range(len(gallery_person_list)):
     #     gallery_hist = np.load(gallery_person_list[i])
@@ -21,6 +22,7 @@ def reID(filename, gallery_person_list):
     #         max_similiar = similiar
     #         person = i
 
+    # 越小越好cv
     # min_similiar = 99999
     # for i in range(len(gallery_person_list)):
     #     gallery_hist = np.load(gallery_person_list[i])
@@ -34,6 +36,7 @@ def reID(filename, gallery_person_list):
     #         min_similiar = similiar
     #         person = i
 
+    # 越小越好distance
     min_similiar = 99999
     for i in range(len(gallery_person_list)):
         gallery_hist = np.load(gallery_person_list[i])
