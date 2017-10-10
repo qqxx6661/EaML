@@ -31,7 +31,7 @@ def cam_predict(cam_id, position):  # 由于场景是预先设计好的，所以
         else: cam[2] = abs(position)
     return cam
 
-exp_info = 'yolo_1607'
+exp_info = 'yolo_1547_'
 person = 'person_1'  # 文件名
 cal_speed_delay = 6  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
@@ -42,7 +42,7 @@ for frame in range(1800):
 all_data_ML = []
 
 # 读取
-with open('gallery/' + person +'.csv') as csvFile:
+with open('gallery/' + exp_info + person + '.csv') as csvFile:
     reader = csv.reader(csvFile)
     for item in reader:
         frame_now = int(item[0])  # 当前处理帧
@@ -83,6 +83,10 @@ with open('gallery/' + person +'.csv') as csvFile:
 for line in all_data:
     print(line)
 
+
+# 这里插入优化函数，去除出错的信息，之后再存入person_x_predict中
+
+
 # 写入person_x_predict
 with open('gallery/' + exp_info + person + '_predict.csv', 'w') as f:
     f_csv = csv.writer(f)
@@ -93,6 +97,7 @@ for line in all_data:
     if len(line) == 5:  # 有速度的才处理
         ML_temp = []
         ML_temp.append(line[1])
+        ML_temp.append(line[0])
         ML_temp.append(line[4][0])
         ML_temp.append(line[4][1])
         cam_list = cam_predict(int(line[1]), line[3])

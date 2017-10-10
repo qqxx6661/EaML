@@ -4,7 +4,7 @@ import CLOUD_reID
 import csv
 
 exp_info = 'yolo_1607'
-gallery_person_list = ['gallery/yolo_1607_71_0.npy', 'gallery/yolo_1607_163_0.npy']  # 画廊人员信息
+gallery_person_list = ['gallery/yolo_1607_107_0.npy', 'gallery/yolo_1607_192_0.npy']  # 画廊人员信息
 person_track_list = [[], []]
 new_person_count = 5  # 5次连续出现，还没使用
 # 创建所有帧数组
@@ -26,8 +26,8 @@ for filename in range(6):
 
 
 # 遍历整个数据集，like：[1778, [5, [37, 81, 108, 234], 'BSU_data/5/1779_0.npy']]
-# for nei in all_data:
-#     print(nei)
+for nei in all_data:
+    print(nei)
 
 # 在每一帧的循环中，将该帧出现的人与画廊进行匹配，若与某人相似度大于某值，则认为是那个人
 for frame in range(len(all_data)):

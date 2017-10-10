@@ -41,7 +41,7 @@ def reID(filename, gallery_person_list):
     for i in range(len(gallery_person_list)):
         gallery_hist = np.load(gallery_person_list[i])
         # print(target_hist)
-        similiar = dist.cityblock(gallery_hist, target_hist)
+        similiar = dist.chebyshev(gallery_hist, target_hist)
         print(filename, gallery_person_list[i], similiar)
         if similiar == 0.0:  # 写入失败文件忽略
             print('图像数据损坏，不予处理')
