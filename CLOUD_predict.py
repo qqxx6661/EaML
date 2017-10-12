@@ -2,6 +2,10 @@
 # coding=utf-8
 import csv
 
+exp_info = 'yolo_1615_'
+person = 'person_0'  # 文件名
+cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
+cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
 def relative_position(cood):
     # 输入两点坐标的list，其实就是矩形的左上角和右下角坐标。求该点在画面内的相对位置（左右来看）。视频分辨率为640x480。
@@ -51,10 +55,6 @@ def judge_cam_location(curr_line, prev_list):  # 判断是否关联并且进入�
         if curr_line[1] == 5 and curr_line[3] > 0 and prev_list[3] < 0: return True
     return False
 
-exp_info = 'yolo_1547_'
-person = 'person_1'  # 文件名
-cal_speed_delay = 6  # 连续在同一摄像头n帧后再计算速度
-cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 # 创建所有帧数组
 all_data = []
 for frame in range(1800):
@@ -70,31 +70,48 @@ with open('gallery/' + exp_info + person + '.csv') as csvFile:
         # 长度大于1说明这帧之前有了，异常.由于暂时一共就两个人，所以只比较两个值，选择距离比较小的一个
         if len(all_data[frame_now]) > 1:
             # 这里若报错，说明前面一帧也没有信息，假设没有出现这种情况
-            last_position = int(all_data[frame_now-1][3])
-            if abs(all_data[frame_now][3] - last_position) > abs(relative_position(eval(item[2])) - last_position):
-                while len(all_data[frame_now]) > 1:
-                    all_data[frame_now].pop()
-            else:
+            if all_data[frame_now-1][1] == all_data[frame_now][1]:  # 该帧已有数据和上一阵在同一摄像头内
+                print('该帧已有数据和上一阵在同一摄像头内')
                 # 不需要存储了，使用上次数据
                 continue
+            elif all_data[frame_now-1][1] == int(item[1]):  # 该帧新数据和上一阵在同一摄像头内
+                print('该帧新数据和上一阵在同一摄像头内')
+                while len(all_data[frame_now]) > 1:
+                    all_data[frame_now].pop()
+            else:  # 摄像头都与上帧不同，采用相对位置，不过这应该没有意义了
+                last_position = int(all_data[frame_now-1][3])
+                print('上个位置与已加入', all_data[frame_now][3] - last_position,
+                      '上个位置与新加入', relative_position(eval(item[2])) - last_position)
+                if abs(all_data[frame_now][3] - last_position) > abs(relative_position(eval(item[2])) - last_position):
+                    while len(all_data[frame_now]) > 1:
+                        all_data[frame_now].pop()
+                else:
+                    # 不需要存储了，使用上次数据
+                    continue
 
         all_data[frame_now].append(int(item[1]))  # 加入camid
         all_data[frame_now].append(eval(item[2]))  # 加入位置，主要用于速度计算
         all_data[frame_now].append(relative_position(eval(item[2])))  # 加入相对位置
+
+
         # 加入速度
         for i in range(cal_speed_delay):
+            print(all_data[frame_now - (i+1)])
             # 连续N帧有
             if len(all_data[frame_now - (i+1)]) == 1:
+                # print('前第', i+1, '帧没信息，不计算速度')
                 cal_speed_delay_flag = 0
                 break
             # 连续N帧在同一个摄像头内
-            if all_data[frame_now - (i+1)][1] != item[1]:
+            if all_data[frame_now - (i+1)][1] != int(item[1]):
+                # print('前第', i+1, '帧不在同一摄像头内，不计算速度')
                 cal_speed_delay_flag = 0
                 break
         if cal_speed_delay_flag == 0:
             cal_speed_delay_flag = 1
-            # print('jump')
+            # print('跳过该帧速度')
             continue
+        print('加入速度')
         speed_x = int(eval(item[2])[0]) - int(all_data[frame_now-1][2][0])
         speed_y = int(eval(item[2])[1]) - int(all_data[frame_now-1][2][1])
         all_data[frame_now].append([speed_x, speed_y])  # x,y轴速度

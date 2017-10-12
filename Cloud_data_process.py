@@ -3,8 +3,8 @@
 import CLOUD_reID
 import csv
 
-exp_info = 'yolo_1607'
-gallery_person_list = ['gallery/yolo_1607_107_0.npy', 'gallery/yolo_1607_192_0.npy']  # 画廊人员信息
+exp_info = 'yolo_1615'
+gallery_person_list = ['gallery/yolo_1615_173_0.npy', 'gallery/yolo_1615_61_0.npy']  # 画廊人员信息
 person_track_list = [[], []]
 new_person_count = 5  # 5次连续出现，还没使用
 # 创建所有帧数组
