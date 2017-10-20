@@ -223,8 +223,8 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
 
 
 if __name__ == '__main__':
-    test_file = "gallery/test/yolo_1607_person_1_ML.csv"
-    train_file = 'gallery/train/yolo_1547_person_1_ML.csv'
+    test_file = "gallery/test/yolo_1607_person_0_ML.csv"
+    train_file = 'gallery/train/yolo_1547_person_0_ML.csv'
     input_frame_number = 50  # 输入维度
     input_label_delay = 1 # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
