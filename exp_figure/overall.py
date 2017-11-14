@@ -18,7 +18,7 @@ def ave(list_name):
 size = 4
 x = np.arange(size)
 
-transmission_cloud = [1920, 4041, 59452, 79562]  # μs per frame 2,4,6,8个摄像头每帧
+transmission_cloud = [1920, 4041, 59452, 79562]  # 2,4,6,8个摄像头每帧
 log(transmission_cloud)
 
 transmission_EaOP = [8.768, 17.536, 35.072, 70.144]
@@ -27,13 +27,13 @@ log(transmission_EaOP)
 video_file_cloud = [56510000, 67513000, 95846000, 124214000]  # cloud处理2,4,6,8个摄像头（30s）
 prediction_cloud = [56000, 108000, 175000, 257000]
 computation_cloud = [56566000, 67621000, 96021000, 124471000]  # 上面两数组相加
-ave(computation_cloud)
+# ave(computation_cloud)
 log(computation_cloud)
 
 video_file_EaOP = [54125000, 65182000, 86251000, 101381000]  # edge各自处理1,2,3,4个摄像头（30s）
 prediction_EaOP = [49000, 90000, 143000, 186000]
 computation_EaOP = [54174000, 65272000, 86394000, 101567000]  # 上面两数组相加
-ave(computation_EaOP)
+# ave(computation_EaOP)
 log(computation_EaOP)
 
 total_width, n = 0.8, 3

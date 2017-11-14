@@ -12,25 +12,23 @@ def log(list_name):
 size = 4
 x = np.arange(size)
 
-video_file = [15000]  # 每帧视频文件大小（byte）
+video_file = [3200000, 6400000, 9600000, 12800000]  # 视频文件大小60s（KB）
 video_file = log(video_file)
 
-data_to_cloud = [5]  # 每帧所有edge上传的文件大小（byte）（2,2,3,4个摄像头）
+data_to_cloud = [6600, 13200, 19800, 26400]  # 所有edge上传的文件大小60s（KB）（2,4,6,8个摄像头）
 data_to_cloud = log(data_to_cloud)
-
-data_to_cloud_np = [2150]  # 每帧所有edge上传的文件大小（byte）（2,2,3,4个摄像头）
-data_to_cloud_np = log(data_to_cloud_np)
 
 total_width, n = 0.8, 3
 width = total_width / n
 x = x - (total_width - width) / 2
 
-plt.ylabel('Communication Cost (lg(Byte))', fontsize=20)
-plt.bar(x-0.45*width, video_file, fc='#036564', width=0.75*width, label='Input Data to Cloud (Cloud)')
+plt.xlabel('Total Camera Numbers', fontsize=20)
+plt.ylabel('Communication Cost (lg(KB))', fontsize=20)
+plt.bar(x-0.45*width, video_file, fc='#036564', width=0.75*width, label='Data to Cloud (Cloud)')
 # plt.bar(x-0.45*width, data_to_cam, fc='#033649', width=0.75*width, bottom=video_file, label='Feedback (Cloud)')
-plt.bar(x+0.45*width, data_to_cloud, fc='#764D39', width=0.75*width, label='Input Data to Cloud (EaOP)')
+plt.bar(x+0.45*width, data_to_cloud, fc='#764D39', width=0.75*width, label='Data to Cloud (EATP)')
 # plt.bar(x+0.45*width, data_to_cam, fc='#250807', width=0.75*width, bottom=data_to_cloud, label='Feedback (EaOT)')
-# plt.xticks(x, (2, 4, 6, 8), fontsize=18)
+plt.xticks(x, (2, 4, 6, 8), fontsize=18)
 plt.yticks(fontsize=18)
-plt.legend(loc='center', bbox_to_anchor=(0.62, 0.11), fontsize=17)
+plt.legend(loc='center', bbox_to_anchor=(0.7, 0.11), fontsize=17)
 plt.show()
