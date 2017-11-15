@@ -40,7 +40,7 @@ width = total_width / n
 x = x - (total_width - width) / 2
 
 plt.xlabel('Total Camera Numbers', fontsize=19)
-plt.ylabel('Computational Cost at Cloud (lg(ms))', fontsize=19)
+plt.ylabel('Computational Cost (lg(ms))', fontsize=19)
 
 
 plt.bar(x-0.45*width, video_file_cloud, fc='#036564', width=0.75*width, label='Object Detection (Cloud)')
@@ -50,5 +50,5 @@ plt.bar(x+0.45*width, prediction_EaOP, fc='#250807', width=0.75*width, label='Pr
 
 plt.xticks(x, (2, 4, 6, 8), fontsize=18)
 plt.yticks(fontsize=18)
-plt.legend(loc='center', bbox_to_anchor=(0.7, 0.11), fontsize=16)
+plt.legend(loc='lower right', fontsize=15)
 plt.show()
