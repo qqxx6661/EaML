@@ -24,7 +24,7 @@ log(transmission_cloud)
 transmission_EaOP = [1289, 2578, 3867, 5156]
 log(transmission_EaOP)
 
-video_file_cloud = [1256000, 2613000, 3845000, 5152000]  # cloud处理2,4,6,8个摄像头（30s）
+video_file_cloud = [2613000, 5152000, 7839000, 10452000]  # cloud处理2,4,6,8个摄像头（30s）
 prediction_cloud = [694.75, 771.51, 867.89, 964.32]
 computation_cloud = [1256694.75, 2613771.51, 3845867.89, 5152964.32]  # 上面两数组相加
 # ave(computation_cloud)

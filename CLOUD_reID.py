@@ -2,7 +2,6 @@
 # coding=utf-8
 from scipy.spatial import distance as dist
 import numpy as np
-import cv2
 
 def reID(filename, gallery_person_list):
     person = 0
@@ -53,6 +52,6 @@ def reID(filename, gallery_person_list):
     return person
 
 
-reID('EDGE/BSU_data/0/61_0.npy', ['gallery/yolo_1547_61_0.npy', 'gallery/yolo_1547_143_0.npy'])
+# reID('EDGE/BSU_data/0/61_0.npy', ['gallery/yolo_1547_61_0.npy', 'gallery/yolo_1547_143_0.npy'])
 
 # print(np.load('BSU_data/0/95_0.npy'))
