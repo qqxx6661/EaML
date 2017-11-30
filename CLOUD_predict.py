@@ -2,9 +2,9 @@
 # coding=utf-8
 import csv
 
-exp_info = 'yolo_1615_'
+exp_info = '3_14_39'
 person = 'person_0'  # 文件名
-cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
+cal_speed_delay = 3  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
 def relative_position(cood):
@@ -45,49 +45,52 @@ def judge_cam_location(curr_line, prev_list):  # 判断是否关联并且进入�
     if prev_list[1] == 2:
         if curr_line[1] == 1 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 3 and curr_line[3] < 0 and prev_list[3] > 0: return True
-        if curr_line[1] == 5 and curr_line[3] < 0 and prev_list[3] < 0: return True  # 2到5比较特殊
+        if curr_line[1] == 4 and curr_line[3] < 0 and prev_list[3] < 0: return True  # 2到5比较特殊
     if prev_list[1] == 3:
         if curr_line[1] == 2 and curr_line[3] > 0: return True  # 1547的3中回来并未识别出来，特殊照顾
-    if prev_list[1] == 5:
-        if curr_line[1] == 2 and curr_line[3] > 0 and prev_list[3] < 0: return True
-        if curr_line[1] == 4 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 4:
-        if curr_line[1] == 5 and curr_line[3] > 0 and prev_list[3] < 0: return True
+        if curr_line[1] == 2: return True  # 由于新实验中4识别较少，特殊情况
+        # if curr_line[1] == 2 and curr_line[3] > 0 and prev_list[3] < 0: return True
+        if curr_line[1] == 5 and curr_line[3] < 0 and prev_list[3] > 0: return True
+    if prev_list[1] == 5:
+        if curr_line[1] == 4 and curr_line[3] > 0 and prev_list[3] < 0: return True
     return False
 
 # 创建所有帧数组
 all_data = []
-for frame in range(1800):
+for frame in range(600):
     all_data.append([frame, ])
 all_data_ML = []
 
 # 读取
-with open('gallery/' + exp_info + person + '.csv') as csvFile:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '.csv') as csvFile:
     reader = csv.reader(csvFile)
     for item in reader:
         frame_now = int(item[0])  # 当前处理帧
 
-        # 长度大于1说明这帧之前有了，异常.由于暂时一共就两个人，所以只比较两个值，选择距离比较小的一个
-        if len(all_data[frame_now]) > 1:
-            # 这里若报错，说明前面一帧也没有信息，假设没有出现这种情况
-            if all_data[frame_now-1][1] == all_data[frame_now][1]:  # 该帧已有数据和上一阵在同一摄像头内
-                print('该帧已有数据和上一阵在同一摄像头内')
-                # 不需要存储了，使用上次数据
-                continue
-            elif all_data[frame_now-1][1] == int(item[1]):  # 该帧新数据和上一阵在同一摄像头内
-                print('该帧新数据和上一阵在同一摄像头内')
-                while len(all_data[frame_now]) > 1:
-                    all_data[frame_now].pop()
-            else:  # 摄像头都与上帧不同，采用相对位置，不过这应该没有意义了
-                last_position = int(all_data[frame_now-1][3])
-                print('上个位置与已加入', all_data[frame_now][3] - last_position,
-                      '上个位置与新加入', relative_position(eval(item[2])) - last_position)
-                if abs(all_data[frame_now][3] - last_position) > abs(relative_position(eval(item[2])) - last_position):
-                    while len(all_data[frame_now]) > 1:
-                        all_data[frame_now].pop()
-                else:
-                    # 不需要存储了，使用上次数据
-                    continue
+        # # 长度大于1说明这帧之前有了，异常.由于暂时一共就两个人，所以只比较两个值，选择距离比较小的一个
+        # try:
+        #     # 这里若报错，说明前面一帧也没有信息，假设没有出现这种情况
+        #     if all_data[frame_now-1][1] == all_data[frame_now][1]:  # 该帧已有数据和上一阵在同一摄像头内
+        #         print('该帧已有数据和上一阵在同一摄像头内')
+        #         # 不需要存储了，使用上次数据
+        #         continue
+        #     elif all_data[frame_now-1][1] == int(item[1]):  # 该帧新数据和上一阵在同一摄像头内
+        #         print('该帧新数据和上一阵在同一摄像头内')
+        #         while len(all_data[frame_now]) > 1:
+        #             all_data[frame_now].pop()
+        #     else:  # 摄像头都与上帧不同，采用相对位置，不过这应该没有意义了
+        #         last_position = int(all_data[frame_now-1][3])
+        #         print('上个位置与已加入', all_data[frame_now][3] - last_position,
+        #               '上个位置与新加入', relative_position(eval(item[2])) - last_position)
+        #         if abs(all_data[frame_now][3] - last_position) > abs(relative_position(eval(item[2])) - last_position):
+        #             while len(all_data[frame_now]) > 1:
+        #                 all_data[frame_now].pop()
+        #         else:
+        #             # 不需要存储了，使用上次数据
+        #             continue
+        # except IndexError as e:
+        #     print(e)
 
         all_data[frame_now].append(int(item[1]))  # 加入camid
         all_data[frame_now].append(eval(item[2]))  # 加入位置，主要用于速度计算
@@ -131,7 +134,7 @@ for l, line in enumerate(all_data):
             prev_frame = line
         else:
             if line[1] == prev_frame[1]:  # 如果相同摄像头,距离绝对值必须小于50
-                if abs(line[3] - prev_frame[3]) <= 50:
+                if abs(line[3] - prev_frame[3]) <= 65:
                     prev_frame = line
                 else:
                     print('去除', line, '对比', prev_frame)
@@ -146,7 +149,7 @@ for l, line in enumerate(all_data):
 
 
 # 写入person_x_predict
-with open('gallery/' + exp_info + person + '_predict.csv', 'w') as f:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_predict.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
@@ -163,6 +166,6 @@ for line in all_data:
             ML_temp.append(cam_value)
         all_data_ML.append(ML_temp)
 
-with open('gallery/' + exp_info + person + '_ML.csv', 'w') as f:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_ML.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data_ML)
