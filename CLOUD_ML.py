@@ -73,20 +73,29 @@ def train_model(train_file_inner, input_frame_number_inner, input_label_delay_in
     data = []
     labels = []
     max_train_num = 10000
-    delay = input_label_delay_inner
+    mode = 6
+    for train_file_each in train_file_inner:
+        delay = input_label_delay_inner  # 改为数组后这个需要放这重置delay
+        with open(train_file_each) as file:
+            for line in file:
+                tokens = line.strip().split(',')
+                # mode4: 筛选出1234摄像头，其余数据不读取
+                if mode == 4:  # 这里需要去掉两个学习摄像头！！！！！！！！！
+                    if tokens[0] not in ['1', '2', '3', '4']:
+                        # print('delete:', tokens)
+                        continue
+                data.append([tk for tk in tokens[1:]])
+                if delay != 0:  # 推迟label
+                    delay -= 1
+                    continue
+                labels.append(tokens[0])
+        if input_label_delay_inner:
+            data = data[:-input_label_delay_inner]  # 删去后面几位
 
-    with open(train_file_inner) as file:
-        for line in file:
-            tokens = line.strip().split(',')
-            data.append([tk for tk in tokens[1:8]])
-            if delay != 0:  # 推迟label
-                delay -= 1
-                continue
-            labels.append(tokens[0])
-    if input_label_delay_inner:
-        data = data[:-input_label_delay_inner]  # 删去后面几位
+        print(len(data), len(labels), data[0], data[-1])
 
     if input_frame_number_inner != 1:
+
         delay_vector = input_frame_number_inner
         temp_vector = []
         temp_data = []
@@ -102,9 +111,10 @@ def train_model(train_file_inner, input_frame_number_inner, input_label_delay_in
             delay_vector = input_frame_number_inner
             temp_data.append(temp_vector)
             temp_vector = []
-        data = temp_data
 
+        data = temp_data
         labels = labels[input_frame_number_inner-1:]
+
 
     if len(data) > max_train_num:  # 控制最大读取行数
         data = data[-max_train_num:]
@@ -113,12 +123,12 @@ def train_model(train_file_inner, input_frame_number_inner, input_label_delay_in
     print("输入维度为：", len(data[0]))
     x = np.array(data)
     y = np.array(labels)
+    print("总data样本数为：", len(x))
+    print("总label样本数为：", len(y))
 
-    print("读取输入样本数为：", len(x))
-    print("读取输出样本数为：", len(labels))
-
+    # 输出所有数据
     for i, line in enumerate(data):
-        print(line, labels[i])
+        print(len(line), line, labels[i])
 
     _train_model_save(x, y, 'global')
 
@@ -130,7 +140,7 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
     with open(test_file_inner) as file:
         for line in file:
             tokens = line.strip().split(',')
-            data.append([tk for tk in tokens[1:8]])
+            data.append([tk for tk in tokens[1:]])
             if delay != 0:  # 推迟label
                 delay -= 1
                 continue
@@ -163,8 +173,6 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
 
     print("读取输入样本数为：", len(test_X))
     print("读取输出样本数为：", len(test_Y))
-    # print('输入：', data)
-    # print('输出：', labels_global, labels_upper)
 
     '''
     start = time.time()
@@ -223,10 +231,10 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
 
 
 if __name__ == '__main__':
-    test_file = "gallery/test/yolo_1607_person_0_ML.csv"
-    train_file = 'gallery/train/yolo_1547_person_0_ML.csv'
-    input_frame_number = 30  # 输入维度
-    input_label_delay = 10 # 预测样本和标签差
+    test_file = "gallery/test/3_14_20_person_2_ML.csv"
+    train_file = ['gallery/train/3_14_25_person_2_ML.csv', 'gallery/train/3_14_28_person_2_ML.csv']
+    input_frame_number = 10  # 输入学习帧数
+    input_label_delay = 10  # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
     cal_accuracy(test_file, input_frame_number, input_label_delay)
 

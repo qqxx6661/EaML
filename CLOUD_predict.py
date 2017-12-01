@@ -2,9 +2,9 @@
 # coding=utf-8
 import csv
 
-exp_info = '3_14_39'
-person = 'person_0'  # 文件名
-cal_speed_delay = 3  # 连续在同一摄像头n帧后再计算速度
+exp_info = '3_14_20'
+person = 'person_2'  # 文件名
+cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
 def relative_position(cood):
@@ -36,22 +36,25 @@ def cam_predict_relative(cam_id, position):  # 由于场景是预先设计好的
     return cam
 
 
-def judge_cam_location(curr_line, prev_list):  # 判断是否关联并且进入正负数是否合理
+def judge_cam_location(curr_line, prev_list):
+    # 判断是否关联并且进入正负数是否合理，由于新实验很多是漏检测而非错误，所以comment掉，之后可以改回来
     if prev_list[1] == 0:
         if curr_line[1] == 1 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 1:
         if curr_line[1] == 0 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 2 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 2:
-        if curr_line[1] == 1 and curr_line[3] > 0 and prev_list[3] < 0: return True
+        if curr_line[1] == 1: return True
+        # if curr_line[1] == 1 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 3 and curr_line[3] < 0 and prev_list[3] > 0: return True
-        if curr_line[1] == 4 and curr_line[3] < 0 and prev_list[3] < 0: return True  # 2到5比较特殊
+        if curr_line[1] == 4 and curr_line[3] < 0 and prev_list[3] < 0: return True
     if prev_list[1] == 3:
-        if curr_line[1] == 2 and curr_line[3] > 0: return True  # 1547的3中回来并未识别出来，特殊照顾
+        if curr_line[1] == 2: return True
     if prev_list[1] == 4:
-        if curr_line[1] == 2: return True  # 由于新实验中4识别较少，特殊情况
+        if curr_line[1] == 2: return True
         # if curr_line[1] == 2 and curr_line[3] > 0 and prev_list[3] < 0: return True
-        if curr_line[1] == 5 and curr_line[3] < 0 and prev_list[3] > 0: return True
+        if curr_line[1] == 5: return True
+        # if curr_line[1] == 5 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 5:
         if curr_line[1] == 4 and curr_line[3] > 0 and prev_list[3] < 0: return True
     return False
@@ -96,7 +99,6 @@ with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '.csv') as csv
         all_data[frame_now].append(eval(item[2]))  # 加入位置，主要用于速度计算
         all_data[frame_now].append(relative_position(eval(item[2])))  # 加入相对位置
 
-
         # 加入速度
         for i in range(cal_speed_delay):
             print(all_data[frame_now - (i+1)])
@@ -134,7 +136,7 @@ for l, line in enumerate(all_data):
             prev_frame = line
         else:
             if line[1] == prev_frame[1]:  # 如果相同摄像头,距离绝对值必须小于50
-                if abs(line[3] - prev_frame[3]) <= 65:
+                if abs(line[3] - prev_frame[3]) <= 180:  # 新实验漏检测，这里限制设置大一些
                     prev_frame = line
                 else:
                     print('去除', line, '对比', prev_frame)
