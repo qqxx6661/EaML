@@ -16,6 +16,7 @@ def relative_position(cood):
 
 def cam_predict_relative(cam_id, position):  # 由于场景是预先设计好的，所以这里需要手动设置
     cam = [0, 0, 0, 0, 0, 0]
+    if cam_id >= 6: return cam
     cam[cam_id] = 100
     if cam_id == 0:
         if position > 0: cam[1] = position
@@ -24,14 +25,14 @@ def cam_predict_relative(cam_id, position):  # 由于场景是预先设计好的
         else: cam[0] = abs(position)
     elif cam_id == 2:
         if position > 0: cam[3] = position
-        else: cam[1] = cam[5] = abs(position)
+        else: cam[1] = cam[4] = abs(position)
     elif cam_id == 3:
         if position < 0: cam[2] = abs(position)
     elif cam_id == 4:
         if position < 0: cam[5] = abs(position)
+        else: cam[2] = abs(position)
     else:
         if position > 0: cam[4] = position
-        else: cam[2] = abs(position)
     return cam
 
 def judge_cam_location(curr_line, prev_list):
@@ -63,19 +64,21 @@ def cam_generate(pre_cam_id, cur_cam_id):
     if pre_cam_id == -1:
         if cur_cam_id == 0:
             return 6
+        elif cur_cam_id == 2:
+            return 7
         elif cur_cam_id == 3:
             return 7
         else:
             return 8
-    elif pre_cam_id == 0 and cur_cam_id == 1:
+    elif (pre_cam_id == 0 and cur_cam_id == 1) or (pre_cam_id == 1 and cur_cam_id == 0):
         return 9
-    elif pre_cam_id == 1 and cur_cam_id == 2:
+    elif (pre_cam_id == 1 and cur_cam_id == 2) or (pre_cam_id == 2 and cur_cam_id == 1):
         return 10
-    elif pre_cam_id == 2 and cur_cam_id == 3:
+    elif (pre_cam_id == 2 and cur_cam_id == 3) or (pre_cam_id == 3 and cur_cam_id == 2):
         return 11
-    elif pre_cam_id == 2 and cur_cam_id == 4:
+    elif (pre_cam_id == 2 and cur_cam_id == 4) or (pre_cam_id == 4 and cur_cam_id == 2):
         return 12
-    elif pre_cam_id == 4 and cur_cam_id == 5:
+    elif (pre_cam_id == 4 and cur_cam_id == 5) or (pre_cam_id == 5 and cur_cam_id == 4):
         return 13
 
 # 创建所有帧数组
@@ -140,11 +143,6 @@ with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '.csv') as csv
         speed_y = int(eval(item[2])[1]) - int(all_data[frame_now-1][2][1])
         all_data[frame_now].append([speed_x, speed_y])  # x,y轴速度
 
-# 遍历all_data
-# for line in all_data:
-#     print(line)
-
-
 # 这里插入优化函数，去除出错的信息，之后再存入person_x_predict中
 prev_frame = []
 for l, line in enumerate(all_data):
@@ -172,15 +170,18 @@ for i, each_data in enumerate(all_data):
     if len(each_data) < 5:
         all_data[i] = all_data[i][:1]
 
+# # 遍历all_data
+# for line in all_data:
+#     print(line)
+
 # 写入person_x_predict
 with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_predict.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
 
-blank_count = -1  # 空白帧数
-pre_cam = -1
-cur_cam = -1
+blank_count = 0  # 空白帧数
+cam_stack = [-1]
 start_loc = 0
 end_loc = 0
 for i, each_data in enumerate(all_data):
@@ -189,36 +190,39 @@ for i, each_data in enumerate(all_data):
     elif len(each_data) != 5 and blank_count == -2:  # 之前有数据，现在没有了
         start_loc = all_data[i-1][3]
         blank_count = 1
-        if all_data[i-1][1] == cur_cam:  # 说明这段间隔是同一摄像头
-            pre_cam = cur_cam
-        else:
-            pre_cam = cur_cam
-            cur_cam = all_data[i-1][1]
-
-
+        if all_data[i-1][1] != cam_stack[-1]:  # 说明这段间隔是同一摄像头
+            cam_stack.append(all_data[i-1][1])
     elif len(each_data) == 5 and blank_count == -2:  # 在连续数据中间
         continue
     else:  # 到了有数据的帧
-        cur_cam = each_data[1]
+        cam_stack.append(each_data[1])
         end_loc = each_data[3]
-        mid_cam = cam_generate(pre_cam, cur_cam)
-        if pre_cam == cur_cam:  # 说明在同一摄像头内
+        mid_cam = cam_generate(cam_stack[-2], cam_stack[-1])
+        if cam_stack[-2] == cam_stack[-1]:  # 说明在同一摄像头内
             speed_frame = abs(start_loc - end_loc) / blank_count
-        else:
-            speed_frame = 100 / blank_count
-        if pre_cam < cur_cam:
-            loc = - start_loc
-        else:
             loc = start_loc
+            if start_loc < end_loc:  # 同摄像头内起始位置比终点位置小，所以升序
+                order = 'ascend'
+            else:
+                order = 'descend'
+        elif cam_stack[-2] < cam_stack[-1]:  # 说明从小编号走到大编号
+            speed_frame = 100 / blank_count
+            loc = -100
+            order = 'ascend'
+        else:  # 说明从大编号走到小编号
+            speed_frame = 100 / blank_count
+            loc = 100
+            order = 'descend'
+
         while blank_count:
             all_data[i-blank_count].append(mid_cam)
             all_data[i-blank_count].append([0, 0, 0, 0])
-            print('前：', pre_cam, '后：', cur_cam, '开始坐标：', start_loc, '结束坐标：', end_loc)
-            if pre_cam > cur_cam:
+            print('前：', cam_stack[-2], '后：', cam_stack[-1], '开始坐标：', start_loc, '结束坐标：', end_loc)
+            if order == 'descend':
                 loc = int(loc - speed_frame)
                 all_data[i - blank_count].append(loc)
                 all_data[i - blank_count].append([-int(speed_frame), 0])
-            else:
+            if order == 'ascend':
                 loc = int(loc + speed_frame)
                 all_data[i - blank_count].append(loc)
                 all_data[i - blank_count].append([int(speed_frame), 0])
@@ -226,7 +230,7 @@ for i, each_data in enumerate(all_data):
             blank_count -= 1
 
         # 重置临时变量
-        blank_count = -2
+        blank_count = -2  # -2代表不是第一次了，-1则是刚开始
         start_loc = 0
         end_loc = 0
         loc = 0
