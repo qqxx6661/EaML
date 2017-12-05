@@ -3,7 +3,7 @@
 import csv
 
 exp_info = '3_14_20'
-person = 'person_2'  # 文件名
+person = 'person_0'  # 文件名
 cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
@@ -13,7 +13,6 @@ def relative_position(cood):
     value = ((0.5 * (cood[0] + cood[2])) - 320) / 320
     value = int(value * 100)
     return value
-
 
 def cam_predict_relative(cam_id, position):  # 由于场景是预先设计好的，所以这里需要手动设置
     cam = [0, 0, 0, 0, 0, 0]
@@ -34,7 +33,6 @@ def cam_predict_relative(cam_id, position):  # 由于场景是预先设计好的
         if position > 0: cam[4] = position
         else: cam[2] = abs(position)
     return cam
-
 
 def judge_cam_location(curr_line, prev_list):
     # 判断是否关联并且进入正负数是否合理，由于新实验很多是漏检测而非错误，所以comment掉，之后可以改回来
@@ -58,6 +56,27 @@ def judge_cam_location(curr_line, prev_list):
     if prev_list[1] == 5:
         if curr_line[1] == 4 and curr_line[3] > 0 and prev_list[3] < 0: return True
     return False
+
+def cam_generate(pre_cam_id, cur_cam_id):
+    if pre_cam_id == cur_cam_id:
+        return pre_cam_id
+    if pre_cam_id == -1:
+        if cur_cam_id == 0:
+            return 6
+        elif cur_cam_id == 3:
+            return 7
+        else:
+            return 8
+    elif pre_cam_id == 0 and cur_cam_id == 1:
+        return 9
+    elif pre_cam_id == 1 and cur_cam_id == 2:
+        return 10
+    elif pre_cam_id == 2 and cur_cam_id == 3:
+        return 11
+    elif pre_cam_id == 2 and cur_cam_id == 4:
+        return 12
+    elif pre_cam_id == 4 and cur_cam_id == 5:
+        return 13
 
 # 创建所有帧数组
 all_data = []
@@ -101,7 +120,7 @@ with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '.csv') as csv
 
         # 加入速度
         for i in range(cal_speed_delay):
-            print(all_data[frame_now - (i+1)])
+            # print(all_data[frame_now - (i+1)])
             # 连续N帧有
             if len(all_data[frame_now - (i+1)]) == 1:
                 # print('前第', i+1, '帧没信息，不计算速度')
@@ -116,7 +135,7 @@ with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '.csv') as csv
             cal_speed_delay_flag = 1
             # print('跳过该帧速度')
             continue
-        print('加入速度')
+        # print('加入速度')
         speed_x = int(eval(item[2])[0]) - int(all_data[frame_now-1][2][0])
         speed_y = int(eval(item[2])[1]) - int(all_data[frame_now-1][2][1])
         all_data[frame_now].append([speed_x, speed_y])  # x,y轴速度
@@ -148,10 +167,72 @@ for l, line in enumerate(all_data):
                     print('去除', line, '对比', prev_frame)
                     all_data[l] = line[:1]
 
-
+# 先删除没有速度的data
+for i, each_data in enumerate(all_data):
+    if len(each_data) < 5:
+        all_data[i] = all_data[i][:1]
 
 # 写入person_x_predict
 with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_predict.csv', 'w') as f:
+    f_csv = csv.writer(f)
+    f_csv.writerows(all_data)
+
+
+blank_count = -1  # 空白帧数
+pre_cam = -1
+cur_cam = -1
+start_loc = 0
+end_loc = 0
+for i, each_data in enumerate(all_data):
+    if len(each_data) != 5 and blank_count != -2:  # 之前没有,现在还没有
+        blank_count += 1
+    elif len(each_data) != 5 and blank_count == -2:  # 之前有数据，现在没有了
+        start_loc = all_data[i-1][3]
+        blank_count = 1
+        if all_data[i-1][1] == cur_cam:  # 说明这段间隔是同一摄像头
+            pre_cam = cur_cam
+        else:
+            pre_cam = cur_cam
+            cur_cam = all_data[i-1][1]
+
+
+    elif len(each_data) == 5 and blank_count == -2:  # 在连续数据中间
+        continue
+    else:  # 到了有数据的帧
+        cur_cam = each_data[1]
+        end_loc = each_data[3]
+        mid_cam = cam_generate(pre_cam, cur_cam)
+        if pre_cam == cur_cam:  # 说明在同一摄像头内
+            speed_frame = abs(start_loc - end_loc) / blank_count
+        else:
+            speed_frame = 100 / blank_count
+        if pre_cam < cur_cam:
+            loc = - start_loc
+        else:
+            loc = start_loc
+        while blank_count:
+            all_data[i-blank_count].append(mid_cam)
+            all_data[i-blank_count].append([0, 0, 0, 0])
+            print('前：', pre_cam, '后：', cur_cam, '开始坐标：', start_loc, '结束坐标：', end_loc)
+            if pre_cam > cur_cam:
+                loc = int(loc - speed_frame)
+                all_data[i - blank_count].append(loc)
+                all_data[i - blank_count].append([-int(speed_frame), 0])
+            else:
+                loc = int(loc + speed_frame)
+                all_data[i - blank_count].append(loc)
+                all_data[i - blank_count].append([int(speed_frame), 0])
+            print(blank_count, i - blank_count, '改变为', all_data[i - blank_count])
+            blank_count -= 1
+
+        # 重置临时变量
+        blank_count = -2
+        start_loc = 0
+        end_loc = 0
+        loc = 0
+
+# 写入person_x_full
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_full.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
