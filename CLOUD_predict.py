@@ -2,8 +2,8 @@
 # coding=utf-8
 import csv
 
-exp_info = '3_14_20'
-person = 'person_0'  # 文件名
+exp_info = '3_14_45'
+person = 'person_2'  # 文件名
 cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
@@ -42,11 +42,13 @@ def judge_cam_location(curr_line, prev_list):
     if prev_list[1] == 1:
         if curr_line[1] == 0 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 2 and curr_line[3] < 0 and prev_list[3] > 0: return True
+        if curr_line[1] == 4: return True
     if prev_list[1] == 2:
         if curr_line[1] == 1: return True
         # if curr_line[1] == 1 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 3 and curr_line[3] < 0 and prev_list[3] > 0: return True
         if curr_line[1] == 4 and curr_line[3] < 0 and prev_list[3] < 0: return True
+        if curr_line[1] == 5: return True
     if prev_list[1] == 3:
         if curr_line[1] == 2: return True
     if prev_list[1] == 4:
@@ -76,7 +78,9 @@ def cam_generate(pre_cam_id, cur_cam_id):
         return 10
     elif (pre_cam_id == 2 and cur_cam_id == 3) or (pre_cam_id == 3 and cur_cam_id == 2):
         return 11
-    elif (pre_cam_id == 2 and cur_cam_id == 4) or (pre_cam_id == 4 and cur_cam_id == 2):
+    elif (pre_cam_id == 2 and cur_cam_id == 4) or (pre_cam_id == 4 and cur_cam_id == 2) \
+            or (pre_cam_id == 2 and cur_cam_id == 5) or (pre_cam_id == 5 and cur_cam_id == 2)\
+            or (pre_cam_id == 1 and cur_cam_id == 4) or (pre_cam_id == 4 and cur_cam_id == 1):
         return 12
     elif (pre_cam_id == 4 and cur_cam_id == 5) or (pre_cam_id == 5 and cur_cam_id == 4):
         return 13
@@ -184,6 +188,7 @@ blank_count = 0  # 空白帧数
 cam_stack = [-1]
 start_loc = 0
 end_loc = 0
+last_index = 0
 for i, each_data in enumerate(all_data):
     if len(each_data) != 5 and blank_count != -2:  # 之前没有,现在还没有
         blank_count += 1
@@ -193,6 +198,7 @@ for i, each_data in enumerate(all_data):
         if all_data[i-1][1] != cam_stack[-1]:  # 说明这段间隔是同一摄像头
             cam_stack.append(all_data[i-1][1])
     elif len(each_data) == 5 and blank_count == -2:  # 在连续数据中间
+        last_index = i  # 给末尾补全用
         continue
     else:  # 到了有数据的帧
         cam_stack.append(each_data[1])
@@ -234,6 +240,14 @@ for i, each_data in enumerate(all_data):
         start_loc = 0
         end_loc = 0
         loc = 0
+        last_index = i  # 给末尾补全用
+
+print(last_index)
+for i in range(last_index+1, len(all_data)):
+    all_data[i].append(all_data[last_index][1])
+    all_data[i].append(all_data[last_index][2])
+    all_data[i].append(all_data[last_index][3])
+    all_data[i].append([0, 0])
 
 # 写入person_x_full
 with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_full.csv', 'w') as f:

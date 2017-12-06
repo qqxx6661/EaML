@@ -81,7 +81,7 @@ def train_model(train_file_inner, input_frame_number_inner, input_label_delay_in
                 tokens = line.strip().split(',')
                 # mode4: 筛选出1234摄像头，其余数据不读取
                 if mode == 4:  # 这里需要去掉两个学习摄像头！！！！！！！！！
-                    if tokens[0] not in ['1', '2', '3', '4']:
+                    if tokens[0] not in ['1', '2', '3', '4', '7', '9', '10', '11', '12', '13']:
                         # print('delete:', tokens)
                         continue
                 data.append([tk for tk in tokens[1:]])
@@ -231,10 +231,10 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
 
 
 if __name__ == '__main__':
-    test_file = "gallery/test/3_14_20_person_2_ML.csv"
-    train_file = ['gallery/train/3_14_25_person_2_ML.csv', 'gallery/train/3_14_28_person_2_ML.csv']
-    input_frame_number = 10  # 输入学习帧数
-    input_label_delay = 10  # 预测样本和标签差
+    test_file = "gallery/test/3_14_25_person_2_ML.csv"
+    train_file = ['gallery/train/3_14_20_person_2_ML.csv', 'gallery/train/3_14_28_person_2_ML.csv']
+    input_frame_number = 30  # 输入学习帧数
+    input_label_delay = 50  # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
     cal_accuracy(test_file, input_frame_number, input_label_delay)
 
