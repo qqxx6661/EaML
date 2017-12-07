@@ -37,8 +37,6 @@ def cam_predict_relative(cam_id, position):  # 由于场景是预先设计好的
 
 def judge_cam_location(curr_line, prev_list):
     # 判断是否关联并且进入正负数是否合理，由于新实验很多是漏检测而非错误，所以comment掉，之后可以改回来
-    if prev_list[1] == 0:
-        if curr_line[1] == 1 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 1:
         if curr_line[1] == 0 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 2 and curr_line[3] < 0 and prev_list[3] > 0: return True
@@ -56,15 +54,13 @@ def judge_cam_location(curr_line, prev_list):
         # if curr_line[1] == 2 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 5: return True
         # if curr_line[1] == 5 and curr_line[3] < 0 and prev_list[3] > 0: return True
-    if prev_list[1] == 5:
-        if curr_line[1] == 4 and curr_line[3] > 0 and prev_list[3] < 0: return True
     return False
 
 def cam_generate(pre_cam_id, cur_cam_id):
     if pre_cam_id == cur_cam_id:
         return pre_cam_id
     if pre_cam_id == -1:
-        if cur_cam_id == 0:
+        if cur_cam_id == 1:
             return 6
         elif cur_cam_id == 2:
             return 7
@@ -72,18 +68,13 @@ def cam_generate(pre_cam_id, cur_cam_id):
             return 7
         else:
             return 8
-    elif (pre_cam_id == 0 and cur_cam_id == 1) or (pre_cam_id == 1 and cur_cam_id == 0):
-        return 9
     elif (pre_cam_id == 1 and cur_cam_id == 2) or (pre_cam_id == 2 and cur_cam_id == 1):
         return 10
     elif (pre_cam_id == 2 and cur_cam_id == 3) or (pre_cam_id == 3 and cur_cam_id == 2):
         return 11
     elif (pre_cam_id == 2 and cur_cam_id == 4) or (pre_cam_id == 4 and cur_cam_id == 2) \
-            or (pre_cam_id == 2 and cur_cam_id == 5) or (pre_cam_id == 5 and cur_cam_id == 2)\
             or (pre_cam_id == 1 and cur_cam_id == 4) or (pre_cam_id == 4 and cur_cam_id == 1):
         return 12
-    elif (pre_cam_id == 4 and cur_cam_id == 5) or (pre_cam_id == 5 and cur_cam_id == 4):
-        return 13
 
 # 创建所有帧数组
 all_data = []
@@ -121,6 +112,10 @@ with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '.csv') as csv
         # except IndexError as e:
         #     print(e)
 
+        # #### 4cam
+
+        if item[1] == '0' or item[1] == '5':
+            continue
         all_data[frame_now].append(int(item[1]))  # 加入camid
         all_data[frame_now].append(eval(item[2]))  # 加入位置，主要用于速度计算
         all_data[frame_now].append(relative_position(eval(item[2])))  # 加入相对位置
@@ -179,7 +174,7 @@ for i, each_data in enumerate(all_data):
 #     print(line)
 
 # 写入person_x_predict
-with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_predict.csv', 'w') as f:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_predict_4cam.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
@@ -250,7 +245,7 @@ for i in range(last_index+1, len(all_data)):
     all_data[i].append([0, 0])
 
 # 写入person_x_full
-with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_full.csv', 'w') as f:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_full_4cam.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
@@ -267,6 +262,6 @@ for line in all_data:
             ML_temp.append(cam_value)
         all_data_ML.append(ML_temp)
 
-with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_ML.csv', 'w') as f:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_ML_4cam.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data_ML)
