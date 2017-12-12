@@ -23,10 +23,6 @@ video_file_cloud = [2613000, 5152000, 7839000, 10452000]  # cloud处理2,4,6,8�
 # video_file_cloud = ave(video_file_cloud)
 log(video_file_cloud)
 
-# video_file_edge = [54125000, 65182000, 86251000, 101381000]  # edge各自处理1,2,3,4个摄像头（30s）
-# ave(video_file_edge)
-# log(video_file_edge)
-
 prediction_cloud = [694.75, 771.51, 867.89, 964.32]  # cloud预测60s视频所用时间，分析视频后预测
 # prediction_cloud = ave(prediction_cloud)
 prediction_cloud = log(prediction_cloud)

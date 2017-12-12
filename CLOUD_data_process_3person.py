@@ -3,10 +3,10 @@
 import CLOUD_reID
 import csv
 
-exp_info = '3_14_20'
-gallery_person_list = ['gallery/' + exp_info + '/' + '192_0.npy',
-                       'gallery/' + exp_info + '/' + '157_0.npy',
-                       'gallery/' + exp_info + '/' + '270_0.npy']  # 画廊人员信息(sn, yzd, ck)
+exp_info = '14-32'
+gallery_person_list = ['gallery/' + exp_info + '/' + '33_0.npy',
+                       'gallery/' + exp_info + '/' + '73_0.npy',
+                       'gallery/' + exp_info + '/' + '28_0.npy']  # 画廊人员信息(yzd,ck,hyt)/(sn, yzd, ck)
 person_track_list = [[], [], []]
 new_person_count = 5  # 5次连续出现，还没使用
 # 创建所有帧数组
@@ -16,7 +16,7 @@ for frame in range(600):
 
 # 从6个csv中循环读取数据，组成当前帧所有数据
 for filename in range(6):
-    with open('EDGE/BSU_data/' + str(filename) + '.csv', "r") as csvFile:
+    with open('EDGE/BSU_data/' + exp_info + '/' + str(filename) + '.csv', "r") as csvFile:
         print('读取:', filename)
         reader = csv.reader(csvFile)
         for frame, item in enumerate(reader):

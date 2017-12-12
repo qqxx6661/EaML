@@ -2,8 +2,8 @@
 # coding=utf-8
 import csv
 
-exp_info = '2_15_02'
-person = 'person_1'  # 文件名
+exp_info = '14-23'
+person = 'person_2'  # 文件名
 cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
@@ -47,7 +47,7 @@ def judge_cam_location(curr_line, prev_list):
         if curr_line[1] == 1: return True
         # if curr_line[1] == 1 and curr_line[3] > 0 and prev_list[3] < 0: return True
         if curr_line[1] == 3 and curr_line[3] < 0 and prev_list[3] > 0: return True
-        if curr_line[1] == 4 and curr_line[3] < 0 and prev_list[3] < 0: return True
+        if curr_line[1] == 4: return True
         if curr_line[1] == 5: return True
     if prev_list[1] == 3:
         if curr_line[1] == 2: return True
@@ -87,7 +87,7 @@ def cam_generate(pre_cam_id, cur_cam_id):
 
 # 创建所有帧数组
 all_data = []
-for frame in range(600):
+for frame in range(180):
     all_data.append([frame, ])
 all_data_ML = []
 
@@ -174,12 +174,12 @@ for i, each_data in enumerate(all_data):
     if len(each_data) < 5:
         all_data[i] = all_data[i][:1]
 
-# # 遍历all_data
+# 遍历all_data
 # for line in all_data:
 #     print(line)
 
 # 写入person_x_predict
-with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_predict.csv', 'w') as f:
+with open('gallery/' + exp_info + '/' + exp_info + '_' + person + '_apredict.csv', 'w') as f:
     f_csv = csv.writer(f)
     f_csv.writerows(all_data)
 
@@ -223,7 +223,7 @@ for i, each_data in enumerate(all_data):
         while blank_count:
             all_data[i-blank_count].append(mid_cam)
             all_data[i-blank_count].append([0, 0, 0, 0])
-            print('前：', cam_stack[-2], '后：', cam_stack[-1], '开始坐标：', start_loc, '结束坐标：', end_loc)
+            # print('前：', cam_stack[-2], '后：', cam_stack[-1], '开始坐标：', start_loc, '结束坐标：', end_loc)
             if order == 'descend':
                 loc = int(loc - speed_frame)
                 all_data[i - blank_count].append(loc)
@@ -232,7 +232,7 @@ for i, each_data in enumerate(all_data):
                 loc = int(loc + speed_frame)
                 all_data[i - blank_count].append(loc)
                 all_data[i - blank_count].append([int(speed_frame), 0])
-            print(blank_count, i - blank_count, '改变为', all_data[i - blank_count])
+            # print(blank_count, i - blank_count, '改变为', all_data[i - blank_count])
             blank_count -= 1
 
         # 重置临时变量
