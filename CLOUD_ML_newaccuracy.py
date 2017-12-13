@@ -33,7 +33,7 @@ def _judge_accuracy(predict_array, real_array):
 
 
 def _judge_accuracy_stack(predict_array_list, labels, label_dealy_list, input_frame):
-    correct_list = [ 0 for _ in range(len(label_dealy_list))]
+    correct_list = [0 for _ in range(len(label_dealy_list))]
     index_start = label_dealy_list[-1] + input_frame - 1  # 10+45=55-1=54
     for i in range(index_start, len(predict_array_list)):  # 从54到179
         real_stack = _generate_path(labels[i:])
@@ -282,10 +282,12 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
     _judge_accuracy_stack(test_X_result, test_Y, input_label_delay_inner, input_frame_number_inner)
 
 if __name__ == '__main__':
+    glo_start = time.time()
     test_file = "gallery/14-08/14-08_person_0_ML.csv"
     train_file = ['gallery/14-12/14-12_person_0_ML.csv']
     input_frame_number = 10  # 输入学习帧数
     input_label_delay = [1, 3, 9, 15, 30, 45]  # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
     cal_accuracy(test_file, input_frame_number, input_label_delay)
-
+    glo_end = time.time()
+    print('global', glo_end - glo_start)

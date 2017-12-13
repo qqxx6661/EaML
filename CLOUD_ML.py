@@ -237,7 +237,7 @@ if __name__ == '__main__':
     test_file = "gallery/test/2_15_02_person_1_ML.csv"
     train_file = ['gallery/train/2_14_54_person_1_ML.csv', 'gallery/train/2_14_59_person_1_ML.csv']
     input_frame_number = 10  # 输入学习帧数
-    input_label_delay = 200  # 预测样本和标签差
+    input_label_delay = 1  # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
     cal_accuracy(test_file, input_frame_number, input_label_delay)
 
