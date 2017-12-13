@@ -11,7 +11,7 @@ person_track_list = [[], [], []]
 new_person_count = 5  # 5次连续出现，还没使用
 # 创建所有帧数组
 all_data = []
-for frame in range(600):
+for frame in range(180):
     all_data.append([frame, ])
 
 # 从6个csv中循环读取数据，组成当前帧所有数据
