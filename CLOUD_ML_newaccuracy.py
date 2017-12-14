@@ -39,15 +39,19 @@ def _judge_accuracy_stack(predict_array_list, labels, label_dealy_list, input_fr
         real_stack = _generate_path(labels[i:])
         for j in range(1, len(label_dealy_list) + 1):  # 从1到6个,依次取前1,2,3,4,5,6个
             predict_stack = _generate_path(predict_array_list[i][:j])
-            print(i, real_stack, predict_stack)
+            print(i, 'real:', real_stack, 'prediction:', predict_stack)
             correct_list[j-1] += 1  # 预先假设正确加1
+            if len(predict_stack) > len(real_stack):  # 预测多走了摄像头
+                print('错误')
+                correct_list[j - 1] -= 1  # 有一个错误直接减1
+                continue
             for n in range(len(predict_stack)):
                 if predict_stack[n] != real_stack[n]:
                     print('错误')
                     correct_list[j - 1] -= 1  # 有一个错误直接减1
                     break
 
-    print(correct_list)
+    print(correct_list, len(predict_array_list) - index_start)
     for i in range(len(correct_list)):
         correct_list[i] /= len(predict_array_list) - index_start
     print(correct_list)
@@ -284,8 +288,18 @@ def cal_accuracy(test_file_inner, input_frame_number_inner, input_label_delay_in
 if __name__ == '__main__':
     glo_start = time.time()
     test_file = "gallery/14-08/14-08_person_0_ML.csv"
-    train_file = ['gallery/14-12/14-12_person_0_ML.csv']
-    input_frame_number = 10  # 输入学习帧数
+    train_file = ['gallery/14-12/14-12_person_0_ML.csv', 'gallery/14-12/14-12_person_1_ML.csv',
+                  'gallery/14-12/14-12_person_2_ML.csv']
+    # train_file = ['gallery/14-12/14-12_person_0_ML.csv', 'gallery/14-12/14-12_person_1_ML.csv',
+    #               'gallery/14-12/14-12_person_2_ML.csv', 'gallery/14-08/14-08_person_0_ML.csv',
+    #               'gallery/14-08/14-08_person_1_ML.csv', 'gallery/14-08/14-08_person_2_ML.csv']
+    # train_file = ['gallery/14-12/14-12_person_0_ML.csv', 'gallery/14-12/14-12_person_1_ML.csv',
+    #               'gallery/14-12/14-12_person_2_ML.csv', 'gallery/14-08/14-08_person_0_ML.csv',
+    #               'gallery/14-08/14-08_person_1_ML.csv', 'gallery/14-08/14-08_person_2_ML.csv',
+    #               'gallery/14-14/14-14_person_0_ML.csv', 'gallery/14-14/14-14_person_1_ML.csv',
+    #               'gallery/14-14/14-14_person_2_ML.csv', 'gallery/14-23/14-23_person_0_ML.csv',
+    #               'gallery/14-23/14-23_person_1_ML.csv', 'gallery/14-23/14-23_person_2_ML.csv']
+    input_frame_number = 3  # 输入学习帧数
     input_label_delay = [1, 3, 9, 15, 30, 45]  # 预测样本和标签差
     train_model(train_file, input_frame_number, input_label_delay)
     cal_accuracy(test_file, input_frame_number, input_label_delay)
