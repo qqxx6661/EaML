@@ -3,11 +3,13 @@
 import CLOUD_reID
 import csv
 
-exp_info = '15-00'
-gallery_person_list = ['gallery/' + exp_info + '/' + '128_0.npy',
-                       'gallery/' + exp_info + '/' + '64_0.npy',
-                       'gallery/' + exp_info + '/' + '89_0.npy']  # 画廊人员信息(yzd,ck,hyt)/(sn, yzd, ck)
-person_track_list = [[], [], []]
+exp_info = '15-36'
+gallery_person_list = ['gallery/' + exp_info + '/' + '124_0.npy',
+                       'gallery/' + exp_info + '/' + '17_0.npy',
+                       'gallery/' + exp_info + '/' + '46_0.npy',
+                       'gallery/' + exp_info + '/' + '133_0.npy',
+                       'gallery/' + exp_info + '/' + '28_0.npy']  # 画廊人员信息(yzd,ck,hyt,sn)
+person_track_list = [[], [], [], [], []]
 new_person_count = 5  # 5次连续出现，还没使用
 # 创建所有帧数组
 all_data = []

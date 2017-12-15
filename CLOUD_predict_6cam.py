@@ -2,8 +2,8 @@
 # coding=utf-8
 import csv
 
-exp_info = '14-23'
-person = 'person_2'  # 文件名
+exp_info = '15-36'
+person = 'person_4'  # 文件名
 cal_speed_delay = 1  # 连续在同一摄像头n帧后再计算速度
 cal_speed_delay_flag = 1  # 连续在同一摄像头n帧都有数据则置为1
 
@@ -40,13 +40,13 @@ def judge_cam_location(curr_line, prev_list):
     if prev_list[1] == 0:
         if curr_line[1] == 1 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 1:
-        if curr_line[1] == 0 and curr_line[3] > 0 and prev_list[3] < 0: return True
-        if curr_line[1] == 2 and curr_line[3] < 0 and prev_list[3] > 0: return True
+        if curr_line[1] == 0: return True
+        if curr_line[1] == 2: return True
         if curr_line[1] == 4: return True
     if prev_list[1] == 2:
         if curr_line[1] == 1: return True
         # if curr_line[1] == 1 and curr_line[3] > 0 and prev_list[3] < 0: return True
-        if curr_line[1] == 3 and curr_line[3] < 0 and prev_list[3] > 0: return True
+        if curr_line[1] == 3: return True
         if curr_line[1] == 4: return True
         if curr_line[1] == 5: return True
     if prev_list[1] == 3:
@@ -57,7 +57,7 @@ def judge_cam_location(curr_line, prev_list):
         if curr_line[1] == 5: return True
         # if curr_line[1] == 5 and curr_line[3] < 0 and prev_list[3] > 0: return True
     if prev_list[1] == 5:
-        if curr_line[1] == 4 and curr_line[3] > 0 and prev_list[3] < 0: return True
+        if curr_line[1] == 4: return True
     return False
 
 def cam_generate(pre_cam_id, cur_cam_id):
